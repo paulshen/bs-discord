@@ -87,7 +87,8 @@ module Websocket = {
     [@bs.meth] "send": 'msg => unit,
   };
 
-  [@bs.new] external make_: (string, protocols) => t('msg) = "WebSocket";
+  [@bs.module] [@bs.new]
+  external make_: (string, protocols) => t('msg) = "ws";
 
   let readyState = ws =>
     switch (ws##readyState) {
