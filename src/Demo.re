@@ -1,3 +1,4 @@
+open Types;
 open WebsocketClient;
 
 [@bs.deriving jsConverter]
@@ -20,34 +21,93 @@ type helloMessageData = {
   heartbeatInterval: int,
 };
 
+[@bs.deriving jsConverter]
+type dispatchMessageType = [
+  | [@bs.as "READY"] `Ready
+  | [@bs.as "GUILD_CREATE"] `GuildCreate
+];
+
+[@bs.deriving abstract]
+type readyPayload = {
+  [@bs.as "session_id"]
+  sessionId: string,
+  user,
+  guilds: array(unavailableGuild),
+};
+
+type dispatchMessage =
+  | Ready(readyPayload)
+  | GuildCreate(guild)
+  | Unknown;
+
 [@bs.deriving abstract]
 type messageData = {
+  t: option(string),
   op: int,
   d: Js.Json.t,
 };
 
 type message =
-  | Hello(helloMessageData);
+  | Hello(helloMessageData)
+  | Dispatch(dispatchMessage)
+  | InvalidSession
+  | Unknown;
 
 exception Unsupported;
 external hackType: 'a => 'b = "%identity";
 let parseMessage = messageData => {
   switch (Belt.Option.getExn(opCodeFromJs(opGet(messageData)))) {
   | Hello => Hello(hackType(dGet(messageData)))
-  | _ => raise(Unsupported)
+  | InvalidSession => InvalidSession
+  | Dispatch =>
+    Dispatch(
+      switch (
+        dispatchMessageTypeFromJs(Belt.Option.getExn(tGet(messageData)))
+      ) {
+      | Some(dispatchMessageType) =>
+        switch (dispatchMessageType) {
+        | `Ready => Ready(hackType(dGet(messageData)))
+        | `GuildCreate => GuildCreate(hackType(dGet(messageData)))
+        }
+      | None => Unknown
+      },
+    )
+  | _ => Unknown
   };
 };
 
 let ws: Websocket.t(string) =
   Websocket.make("wss://gateway.discord.gg/?v=6&encoding=json");
 
-Websocket.onOpen(ws, _ => Js.log("onOpen"));
+Websocket.onOpen(
+  ws,
+  _ => {
+    Js.log("onOpen");
+    Websocket.send(
+      ws,
+      Js.Json.stringify(
+        hackType({
+          "op": opCodeToJs(Identify),
+          "d": {
+            "token": "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k",
+            "properties": {
+              "$os": "darwin",
+              "$browser": "bs-discord",
+              "$device": "bs-discord",
+            },
+          },
+        }),
+      ),
+    );
+  },
+);
 
 [@bs.scope "JSON"] [@bs.val]
 external parseIntoMessageData: string => messageData = "parse";
 Websocket.onMessage(
   ws,
   ev => {
+    Js.log(MessageEvent.data(ev));
     let message = ev->MessageEvent.data->parseIntoMessageData->parseMessage;
     Js.log2("onMessage", message);
     ();
