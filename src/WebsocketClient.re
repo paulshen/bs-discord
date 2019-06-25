@@ -2,9 +2,8 @@
 
 module MessageEvent = {
   type t;
-  type data('a);
 
-  [@bs.get] external data: t => data('a) = "data";
+  [@bs.get] external data: t => string = "data";
   [@bs.get] external type_: t => string = "type";
 };
 
