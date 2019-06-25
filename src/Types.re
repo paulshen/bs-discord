@@ -61,3 +61,35 @@ type unavailableGuild = {
   id: snowflake,
   unavailable: bool,
 };
+
+[@bs.deriving jsConverter]
+type messageType =
+  | [@bs.as 0] Default
+  | [@bs.as 1] RecipientAdd
+  | [@bs.as 2] RecipientRemove
+  | [@bs.as 3] Call
+  | [@bs.as 4] ChannelNameChange
+  | [@bs.as 5] ChannelIconChange
+  | [@bs.as 6] ChannelPinnedMessage
+  | [@bs.as 7] GuildMemberJoin
+  | [@bs.as 8] UserPremiumGuildSubscription
+  | [@bs.as 9] UserPremiumGuildSubscriptionTier1
+  | [@bs.as 10] UserPremiumGuildSubscriptionTier2
+  | [@bs.as 11] UserPremiumGuildSubscriptionTier3;
+
+[@bs.deriving abstract]
+type message = {
+  id: snowflake,
+  [@bs.as "channel_id"]
+  channelId: snowflake,
+  [@bs.as "guild_id"]
+  guildId: snowflake,
+  author: user, /* TODO: handle webhook */
+  content: string,
+  timestamp: string,
+  edited_timestamp: option(string),
+  tts: bool,
+  mention_everyone: bool,
+  [@bs.as "type"]
+  type_: int,
+};

@@ -37,15 +37,19 @@ var jsMapperConstantArray$1 = /* array */[
   /* tuple */[
     889912559,
     "GUILD_CREATE"
+  ],
+  /* tuple */[
+    975859715,
+    "MESSAGE_CREATE"
   ]
 ];
 
 function dispatchMessageTypeToJs(param) {
-  return Js_mapperRt.binarySearch(2, param, jsMapperConstantArray$1);
+  return Js_mapperRt.binarySearch(3, param, jsMapperConstantArray$1);
 }
 
 function dispatchMessageTypeFromJs(param) {
-  return Js_mapperRt.revSearch(2, jsMapperConstantArray$1, param);
+  return Js_mapperRt.revSearch(3, jsMapperConstantArray$1, param);
 }
 
 var Unsupported = Caml_exceptions.create("Demo-BsDiscord.Unsupported");
@@ -55,9 +59,16 @@ function parseMessage(messageData) {
   switch (match) {
     case 0 : 
         var match$1 = dispatchMessageTypeFromJs(Belt_Option.getExn(messageData.t));
-        return /* Dispatch */Block.__(1, [match$1 !== undefined ? (
-                      match$1 >= 889912559 ? /* GuildCreate */Block.__(1, [messageData.d]) : /* Ready */Block.__(0, [messageData.d])
-                    ) : /* Unknown */0]);
+        var tmp;
+        if (match$1 !== undefined) {
+          var dispatchMessageType = match$1;
+          tmp = dispatchMessageType !== 889912559 ? (
+              dispatchMessageType >= 975859715 ? /* MessageCreate */Block.__(2, [messageData.d]) : /* Ready */Block.__(0, [messageData.d])
+            ) : /* GuildCreate */Block.__(1, [messageData.d]);
+        } else {
+          tmp = /* Unknown */0;
+        }
+        return /* Dispatch */Block.__(1, [tmp]);
     case 8 : 
         return /* InvalidSession */0;
     case 9 : 

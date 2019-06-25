@@ -25,6 +25,7 @@ type helloMessageData = {
 type dispatchMessageType = [
   | [@bs.as "READY"] `Ready
   | [@bs.as "GUILD_CREATE"] `GuildCreate
+  | [@bs.as "MESSAGE_CREATE"] `MessageCreate
 ];
 
 [@bs.deriving abstract]
@@ -38,6 +39,7 @@ type readyPayload = {
 type dispatchMessage =
   | Ready(readyPayload)
   | GuildCreate(guild)
+  | MessageCreate(message)
   | Unknown;
 
 [@bs.deriving abstract]
@@ -68,6 +70,7 @@ let parseMessage = messageData => {
         switch (dispatchMessageType) {
         | `Ready => Ready(hackType(dGet(messageData)))
         | `GuildCreate => GuildCreate(hackType(dGet(messageData)))
+        | `MessageCreate => MessageCreate(hackType(dGet(messageData)))
         }
       | None => Unknown
       },
