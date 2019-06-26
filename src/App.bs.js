@@ -73,6 +73,8 @@ function handleMessage(message) {
             } else {
               return /* () */0;
             }
+        case 3 : 
+            return PresenceStore$BsDiscord.updatePresence(match[0]);
         default:
           return /* () */0;
       }

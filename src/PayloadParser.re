@@ -80,7 +80,11 @@ let presenceUpdate = (json): presenceUpdate => {
     roles: json |> optional(field("roles", array(string))),
     game: json |> optional(field("game", optional(activity))),
     guildId: json |> optional(field("guild_id", string)),
-    status: json |> optional(field("status", string)),
+    status:
+      (json |> optional(field("status", string)))
+      ->Belt.Option.map(statusString =>
+          Belt.Option.getExn(statusFromJs(statusString))
+        ),
     activities: json |> optional(field("activities", array(activity))),
     clientStatus: json |> optional(field("client_status", clientStatus)),
   };
@@ -148,6 +152,8 @@ let parseSocketData = json => {
         | Some(`Ready) => Ready(field("d", readyPayload, json))
         | Some(`GuildCreate) => GuildCreate(field("d", guild, json))
         | Some(`MessageCreate) => MessageCreate(field("d", message, json))
+        | Some(`PresenceUpdate) =>
+          PresenceUpdate(field("d", presenceUpdate, json))
         | Some(`Resume) => Resume(field("d", resumePayload, json))
         | None => Unknown
         },

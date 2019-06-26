@@ -37,6 +37,33 @@ function clientStatusTypeFromJs(param) {
   return Js_mapperRt.revSearch(3, jsMapperConstantArray, param);
 }
 
+var jsMapperConstantArray$1 = /* array */[
+  /* tuple */[
+    3406202,
+    "dnd"
+  ],
+  /* tuple */[
+    538490563,
+    "offline"
+  ],
+  /* tuple */[
+    814535476,
+    "idle"
+  ],
+  /* tuple */[
+    871917747,
+    "online"
+  ]
+];
+
+function statusToJs(param) {
+  return Js_mapperRt.binarySearch(4, param, jsMapperConstantArray$1);
+}
+
+function statusFromJs(param) {
+  return Js_mapperRt.revSearch(4, jsMapperConstantArray$1, param);
+}
+
 function messageTypeToJs(param) {
   return param + 0 | 0;
 }
@@ -52,6 +79,8 @@ exports.activityTypeToJs = activityTypeToJs;
 exports.activityTypeFromJs = activityTypeFromJs;
 exports.clientStatusTypeToJs = clientStatusTypeToJs;
 exports.clientStatusTypeFromJs = clientStatusTypeFromJs;
+exports.statusToJs = statusToJs;
+exports.statusFromJs = statusFromJs;
 exports.messageTypeToJs = messageTypeToJs;
 exports.messageTypeFromJs = messageTypeFromJs;
 /* No side effect */

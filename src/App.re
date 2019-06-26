@@ -92,6 +92,8 @@ let handleMessage = message => {
     | Some(presences) => PresenceStore.updatePresences(presences)
     | None => ()
     }
+  | Dispatch(PresenceUpdate(presenceUpdate)) =>
+    PresenceStore.updatePresence(presenceUpdate)
   | _ => ()
   };
 };

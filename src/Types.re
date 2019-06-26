@@ -50,13 +50,20 @@ type clientStatus = {
   web: option(clientStatusType),
 };
 
+[@bs.deriving jsConverter]
+type status = [
+  | [@bs.as "online"] `Online
+  | [@bs.as "idle"] `Idle
+  | [@bs.as "dnd"] `Dnd
+  | [@bs.as "offline"] `Offline
+];
 type presenceUser = {id: snowflake};
 type presence = {
   user: presenceUser,
   roles: array(snowflake),
   game: option(activity),
   guildId: snowflake,
-  status: string,
+  status,
   activities: array(activity),
   clientStatus,
 };
@@ -65,7 +72,7 @@ type presenceUpdate = {
   roles: option(array(snowflake)),
   game: option(option(activity)),
   guildId: option(snowflake),
-  status: option(string),
+  status: option(status),
   activities: option(array(activity)),
   clientStatus: option(clientStatus),
 };

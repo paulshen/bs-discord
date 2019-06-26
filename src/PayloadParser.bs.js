@@ -141,9 +141,11 @@ function presenceUpdate(json) {
           /* guildId */Json_decode.optional((function (param) {
                   return Json_decode.field("guild_id", Json_decode.string, param);
                 }), json),
-          /* status */Json_decode.optional((function (param) {
-                  return Json_decode.field("status", Json_decode.string, param);
-                }), json),
+          /* status */Belt_Option.map(Json_decode.optional((function (param) {
+                      return Json_decode.field("status", Json_decode.string, param);
+                    }), json), (function (statusString) {
+                  return Belt_Option.getExn(Types$BsDiscord.statusFromJs(statusString));
+                })),
           /* activities */Json_decode.optional((function (param) {
                   return Json_decode.field("activities", (function (param) {
                                 return Json_decode.array(activity, param);
@@ -239,11 +241,13 @@ function parseSocketData(json) {
         var tmp;
         if (match$1 !== undefined) {
           var match$2 = match$1;
-          tmp = match$2 >= 975859715 ? (
-              match$2 >= 1025039821 ? /* Resume */Block.__(3, [Json_decode.field("d", resumePayload, json)]) : /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)])
-            ) : (
-              match$2 >= 889912559 ? /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
-            );
+          tmp = match$2 !== -41763132 ? (
+              match$2 >= 975859715 ? (
+                  match$2 >= 1025039821 ? /* Resume */Block.__(4, [Json_decode.field("d", resumePayload, json)]) : /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)])
+                ) : (
+                  match$2 >= 889912559 ? /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
+                )
+            ) : /* PresenceUpdate */Block.__(3, [Json_decode.field("d", presenceUpdate, json)]);
         } else {
           tmp = /* Unknown */0;
         }
