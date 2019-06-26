@@ -31,10 +31,8 @@ let updatePresence = presenceUpdate => {
     | None => presenceUpdate
     };
   presences := (presences^)->Belt.Map.String.set(userId, newPresence);
-  Js.log2("updatePresence", presences^);
 };
 
 let updatePresences = presenceUpdates => {
   Array.iter(updatePresence, presenceUpdates);
-  Js.log2("updatePresences", presences^);
 };

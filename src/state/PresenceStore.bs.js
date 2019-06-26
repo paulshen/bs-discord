@@ -34,14 +34,11 @@ function updatePresence(presenceUpdate) {
     newPresence = presenceUpdate;
   }
   presences[0] = Belt_MapString.set(presences[0], userId, newPresence);
-  console.log("updatePresence", presences[0]);
   return /* () */0;
 }
 
 function updatePresences(presenceUpdates) {
-  $$Array.iter(updatePresence, presenceUpdates);
-  console.log("updatePresences", presences[0]);
-  return /* () */0;
+  return $$Array.iter(updatePresence, presenceUpdates);
 }
 
 exports.presences = presences;

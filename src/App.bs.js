@@ -75,12 +75,19 @@ function handleMessage(message) {
             } else {
               return /* () */0;
             }
+        case 2 : 
+            var message$1 = match[0];
+            if ("ping".indexOf(message$1[/* content */4]) !== -1) {
+              ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
+              return /* () */0;
+            } else {
+              return 0;
+            }
         case 3 : 
-            PresenceStore$BsDiscord.updatePresence(match[0]);
-            ChannelApi$BsDiscord.createMessage("546759559973175321", "hello");
+            return PresenceStore$BsDiscord.updatePresence(match[0]);
+        case 4 : 
             return /* () */0;
-        default:
-          return /* () */0;
+        
       }
     }
   } else {

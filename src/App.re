@@ -92,9 +92,12 @@ let handleMessage = message => {
     | Some(presences) => PresenceStore.updatePresences(presences)
     | None => ()
     }
+  | Dispatch(MessageCreate(message)) =>
+    if (Js.String.indexOf(message.content, "ping") != (-1)) {
+      ChannelApi.createMessage(message.channelId, "pong") |> ignore;
+    }
   | Dispatch(PresenceUpdate(presenceUpdate)) =>
-    PresenceStore.updatePresence(presenceUpdate);
-    ChannelApi.createMessage("546759559973175321", "hello") |> ignore;
+    PresenceStore.updatePresence(presenceUpdate)
   | _ => ()
   };
 };
