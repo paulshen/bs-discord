@@ -30,6 +30,7 @@ Websocket.onOpen(
   },
 );
 
+let lastSequenceId: ref(option(int)) = ref(None);
 let handleMessage = message => {
   switch (message) {
   | Hello(payload) =>
@@ -38,7 +39,17 @@ let handleMessage = message => {
         Js.log("heartbeat");
         Websocket.send(
           ws,
-          Js.Json.stringify(hackType({"op": opCodeToJs(Heartbeat)})),
+          Js.Json.stringify(
+            hackType({
+              "op": opCodeToJs(Heartbeat),
+              "d":
+                switch (lastSequenceId^) {
+                | Some(heartbeatSequence) =>
+                  Js.Nullable.return(heartbeatSequence)
+                | None => Js.Nullable.null
+                },
+            }),
+          ),
         );
       },
       payload.heartbeatInterval,
@@ -52,10 +63,13 @@ Websocket.onMessage(
   ws,
   ev => {
     Js.log(MessageEvent.data(ev));
-    let message =
-      PayloadParser.parseSocketData(
-        Js.Json.parseExn(MessageEvent.data(ev)),
-      );
+    let json = Js.Json.parseExn(MessageEvent.data(ev));
+    switch (json |> Json.Decode.(field("s", optional(int)))) {
+    | Some(sequenceId) => lastSequenceId := Some(sequenceId)
+    | None => ()
+    };
+
+    let message = PayloadParser.parseSocketData(json);
     Js.log2("onMessage", message);
     handleMessage(message);
     ();
