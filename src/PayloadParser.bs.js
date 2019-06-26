@@ -3,7 +3,9 @@
 
 var Block = require("bs-platform/lib/js/block.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
+var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
+var Types$BsDiscord = require("./Types.bs.js");
 var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 
 function channel(json) {
@@ -59,6 +61,94 @@ function guildMember(json) {
                 }), json),
           /* roles */Json_decode.field("roles", (function (param) {
                   return Json_decode.array(Json_decode.string, param);
+                }), json),
+          /* joinedAt */Json_decode.field("joined_at", Json_decode.date, json),
+          /* premiumSince */Json_decode.field("premium_since", (function (param) {
+                  return Json_decode.optional(Json_decode.date, param);
+                }), json),
+          /* deaf */Json_decode.field("deaf", Json_decode.bool, json),
+          /* mute */Json_decode.field("mute", Json_decode.bool, json)
+        ];
+}
+
+function presenceUser(json) {
+  return /* record */[/* id */Json_decode.field("id", Json_decode.string, json)];
+}
+
+function unwrapOption(param) {
+  if (param !== undefined) {
+    var match = Caml_option.valFromOption(param);
+    if (match !== undefined) {
+      return Caml_option.some(Caml_option.valFromOption(match));
+    } else {
+      return undefined;
+    }
+  }
+  
+}
+
+function activity(json) {
+  return /* record */[
+          /* name */Json_decode.field("name", Json_decode.string, json),
+          /* type_ */Belt_Option.getExn(Types$BsDiscord.activityTypeFromJs(Json_decode.field("type", Json_decode.$$int, json))),
+          /* url */unwrapOption(Json_decode.optional((function (param) {
+                      return Json_decode.field("url", (function (param) {
+                                    return Json_decode.optional(Json_decode.string, param);
+                                  }), param);
+                    }), json)),
+          /* applicationId */Json_decode.optional((function (param) {
+                  return Json_decode.field("application_id", Json_decode.string, param);
+                }), json),
+          /* flags */Json_decode.optional((function (param) {
+                  return Json_decode.field("flags", Json_decode.$$int, param);
+                }), json)
+        ];
+}
+
+function clientStatus(json) {
+  return /* record */[
+          /* desktop */Belt_Option.map(Json_decode.optional((function (param) {
+                      return Json_decode.field("desktop", Json_decode.string, param);
+                    }), json), (function (statusString) {
+                  return Belt_Option.getExn(Types$BsDiscord.clientStatusTypeFromJs(statusString));
+                })),
+          /* mobile */Belt_Option.map(Json_decode.optional((function (param) {
+                      return Json_decode.field("mobile", Json_decode.string, param);
+                    }), json), (function (statusString) {
+                  return Belt_Option.getExn(Types$BsDiscord.clientStatusTypeFromJs(statusString));
+                })),
+          /* web */Belt_Option.map(Json_decode.optional((function (param) {
+                      return Json_decode.field("web", Json_decode.string, param);
+                    }), json), (function (statusString) {
+                  return Belt_Option.getExn(Types$BsDiscord.clientStatusTypeFromJs(statusString));
+                }))
+        ];
+}
+
+function presenceUpdate(json) {
+  return /* record */[
+          /* user */Json_decode.field("user", presenceUser, json),
+          /* roles */Json_decode.optional((function (param) {
+                  return Json_decode.field("roles", (function (param) {
+                                return Json_decode.array(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* game */Json_decode.optional((function (param) {
+                  return Json_decode.field("game", activity, param);
+                }), json),
+          /* guildId */Json_decode.optional((function (param) {
+                  return Json_decode.field("guild_id", Json_decode.string, param);
+                }), json),
+          /* status */Json_decode.optional((function (param) {
+                  return Json_decode.field("status", Json_decode.string, param);
+                }), json),
+          /* activities */Json_decode.optional((function (param) {
+                  return Json_decode.field("activities", (function (param) {
+                                return Json_decode.array(activity, param);
+                              }), param);
+                }), json),
+          /* clientStatus */Json_decode.optional((function (param) {
+                  return Json_decode.field("client_status", clientStatus, param);
                 }), json)
         ];
 }
@@ -85,6 +175,11 @@ function guild(json) {
           /* channels */Json_decode.optional((function (param) {
                   return Json_decode.field("channels", (function (param) {
                                 return Json_decode.array(channel, param);
+                              }), param);
+                }), json),
+          /* presences */Json_decode.optional((function (param) {
+                  return Json_decode.field("presences", (function (param) {
+                                return Json_decode.array(presenceUpdate, param);
                               }), param);
                 }), json)
         ];
@@ -171,6 +266,11 @@ function parseSocketData(json) {
 exports.channel = channel;
 exports.user = user;
 exports.guildMember = guildMember;
+exports.presenceUser = presenceUser;
+exports.unwrapOption = unwrapOption;
+exports.activity = activity;
+exports.clientStatus = clientStatus;
+exports.presenceUpdate = presenceUpdate;
 exports.guild = guild;
 exports.unavailableGuild = unavailableGuild;
 exports.message = message;

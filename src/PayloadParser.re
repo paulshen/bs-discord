@@ -31,6 +31,58 @@ let guildMember = (json): guildMember => {
     user: json |> field("user", user),
     nick: json |> optional(field("nick", string)),
     roles: json |> field("roles", array(string)),
+    joinedAt: json |> field("joined_at", date),
+    premiumSince: json |> field("premium_since", optional(date)),
+    deaf: json |> field("deaf", bool),
+    mute: json |> field("mute", bool),
+  };
+};
+
+let presenceUser = (json): presenceUser => {
+  Json.Decode.{id: json |> field("id", string)};
+};
+let unwrapOption =
+  fun
+  | Some(Some(x)) => Some(x)
+  | _ => None;
+let activity = (json): activity => {
+  Json.Decode.{
+    name: json |> field("name", string),
+    type_:
+      json |> field("type", int) |> activityTypeFromJs |> Belt.Option.getExn,
+    url: json |> optional(field("url", optional(string))) |> unwrapOption,
+    applicationId: json |> optional(field("application_id", string)),
+    flags: json |> optional(field("flags", int)),
+  };
+};
+let clientStatus = (json): clientStatus => {
+  Json.Decode.{
+    desktop:
+      (json |> optional(field("desktop", string)))
+      ->Belt.Option.map(statusString =>
+          Belt.Option.getExn(clientStatusTypeFromJs(statusString))
+        ),
+    mobile:
+      (json |> optional(field("mobile", string)))
+      ->Belt.Option.map(statusString =>
+          Belt.Option.getExn(clientStatusTypeFromJs(statusString))
+        ),
+    web:
+      (json |> optional(field("web", string)))
+      ->Belt.Option.map(statusString =>
+          Belt.Option.getExn(clientStatusTypeFromJs(statusString))
+        ),
+  };
+};
+let presenceUpdate = (json): presenceUpdate => {
+  Json.Decode.{
+    user: json |> field("user", presenceUser),
+    roles: json |> optional(field("roles", array(string))),
+    game: json |> optional(field("game", activity)),
+    guildId: json |> optional(field("guild_id", string)),
+    status: json |> optional(field("status", string)),
+    activities: json |> optional(field("activities", array(activity))),
+    clientStatus: json |> optional(field("client_status", clientStatus)),
   };
 };
 
@@ -44,6 +96,7 @@ let guild = (json): guild => {
     ownerId: json |> field("owner_id", string),
     members: json |> optional(field("members", array(guildMember))),
     channels: json |> optional(field("channels", array(channel))),
+    presences: json |> optional(field("presences", array(presenceUpdate))),
   };
 };
 

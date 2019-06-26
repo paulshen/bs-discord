@@ -18,7 +18,56 @@ type guildMember = {
   user,
   nick: option(string),
   roles: array(snowflake),
+  joinedAt: Js.Date.t,
+  premiumSince: option(Js.Date.t),
+  deaf: bool,
+  mute: bool,
+};
+
+[@bs.deriving jsConverter]
+type activityType =
+  | [@bs.as 0] Game
+  | [@bs.as 1] Streaming
+  | [@bs.as 2] Listening;
+type activity = {
+  name: string,
+  type_: activityType,
+  url: option(string),
+  applicationId: option(snowflake),
+  flags: option(int),
   /* todo */
+};
+
+[@bs.deriving jsConverter]
+type clientStatusType = [
+  | [@bs.as "online"] `Online
+  | [@bs.as "idle"] `Idle
+  | [@bs.as "dnd"] `Dnd
+];
+type clientStatus = {
+  desktop: option(clientStatusType),
+  mobile: option(clientStatusType),
+  web: option(clientStatusType),
+};
+
+type presenceUser = {id: snowflake};
+type presence = {
+  user: presenceUser,
+  roles: array(snowflake),
+  game: option(activity),
+  guildId: snowflake,
+  status: string,
+  activities: array(activity),
+  clientStatus,
+};
+type presenceUpdate = {
+  user: presenceUser,
+  roles: option(array(snowflake)),
+  game: option(activity),
+  guildId: option(snowflake),
+  status: option(string),
+  activities: option(array(activity)),
+  clientStatus: option(clientStatus),
 };
 
 type channel = {
@@ -38,6 +87,7 @@ type guild = {
   ownerId: snowflake,
   members: option(array(guildMember)),
   channels: option(array(channel)),
+  presences: option(array(presenceUpdate)),
   /* todo */
 };
 
