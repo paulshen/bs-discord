@@ -8,19 +8,6 @@ var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Types$BsDiscord = require("./Types.bs.js");
 var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 
-function channel(json) {
-  return /* record */[
-          /* id */Json_decode.field("id", Json_decode.string, json),
-          /* type_ */Json_decode.field("type", Json_decode.$$int, json),
-          /* guildId */Json_decode.optional((function (param) {
-                  return Json_decode.field("guild_id", Json_decode.string, param);
-                }), json),
-          /* name */Json_decode.optional((function (param) {
-                  return Json_decode.field("name", Json_decode.string, param);
-                }), json)
-        ];
-}
-
 function user(json) {
   return /* record */[
           /* id */Json_decode.field("id", Json_decode.string, json),
@@ -49,6 +36,66 @@ function user(json) {
                 }), json),
           /* premiumType */Json_decode.optional((function (param) {
                   return Json_decode.field("premium_type", Json_decode.$$int, param);
+                }), json)
+        ];
+}
+
+function channel(json) {
+  return /* record */[
+          /* id */Json_decode.field("id", Json_decode.string, json),
+          /* type_ */Belt_Option.getExn(Types$BsDiscord.channelTypeFromJs(Json_decode.field("type", Json_decode.$$int, json))),
+          /* guildId */Json_decode.optional((function (param) {
+                  return Json_decode.field("guild_id", Json_decode.string, param);
+                }), json),
+          /* position */Json_decode.optional((function (param) {
+                  return Json_decode.field("position", Json_decode.$$int, param);
+                }), json),
+          /* name */Json_decode.optional((function (param) {
+                  return Json_decode.field("name", Json_decode.string, param);
+                }), json),
+          /* topic */Json_decode.optional((function (param) {
+                  return Json_decode.field("topic", Json_decode.string, param);
+                }), json),
+          /* nsfw */Json_decode.optional((function (param) {
+                  return Json_decode.field("nsfw", Json_decode.bool, param);
+                }), json),
+          /* lastMessageId */Json_decode.optional((function (param) {
+                  return Json_decode.field("lastMessageId", (function (param) {
+                                return Json_decode.optional(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* bitrate */Json_decode.optional((function (param) {
+                  return Json_decode.field("bitrate", Json_decode.$$int, param);
+                }), json),
+          /* userLimit */Json_decode.optional((function (param) {
+                  return Json_decode.field("userLimit", Json_decode.$$int, param);
+                }), json),
+          /* rateLimitPerUser */Json_decode.optional((function (param) {
+                  return Json_decode.field("rateLimitPerUser", Json_decode.$$int, param);
+                }), json),
+          /* recipients */Json_decode.optional((function (param) {
+                  return Json_decode.field("recipients", (function (param) {
+                                return Json_decode.array(user, param);
+                              }), param);
+                }), json),
+          /* icon */Json_decode.optional((function (param) {
+                  return Json_decode.field("icon", (function (param) {
+                                return Json_decode.optional(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* ownerId */Json_decode.optional((function (param) {
+                  return Json_decode.field("ownerId", Json_decode.string, param);
+                }), json),
+          /* applicationId */Json_decode.optional((function (param) {
+                  return Json_decode.field("applicationId", Json_decode.string, param);
+                }), json),
+          /* parentId */Json_decode.optional((function (param) {
+                  return Json_decode.field("parentId", (function (param) {
+                                return Json_decode.optional(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* lastPinTimestamp */Json_decode.optional((function (param) {
+                  return Json_decode.field("lastPinTimestamp", Json_decode.date, param);
                 }), json)
         ];
 }
@@ -271,8 +318,8 @@ function parseSocketData(json) {
   }
 }
 
-exports.channel = channel;
 exports.user = user;
+exports.channel = channel;
 exports.guildMember = guildMember;
 exports.presenceUser = presenceUser;
 exports.unwrapOption = unwrapOption;

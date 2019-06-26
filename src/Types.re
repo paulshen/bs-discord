@@ -77,12 +77,34 @@ type presenceUpdate = {
   clientStatus: option(clientStatus),
 };
 
+[@bs.deriving jsConverter]
+type channelType =
+  | [@bs.as 0] GuildText
+  | [@bs.as 1] DM
+  | [@bs.as 2] GuildVoice
+  | [@bs.as 3] GroupDM
+  | [@bs.as 4] GuildCategory
+  | [@bs.as 5] GuildNews
+  | [@bs.as 6] GuildStore;
 type channel = {
   id: snowflake,
-  type_: int,
+  type_: channelType,
   guildId: option(snowflake),
+  position: option(int),
   name: option(string),
-  /* todo */
+  topic: option(string),
+  nsfw: option(bool),
+  lastMessageId: option(option(snowflake)),
+  bitrate: option(int),
+  userLimit: option(int),
+  rateLimitPerUser: option(int),
+  recipients: option(array(user)),
+  icon: option(option(string)),
+  ownerId: option(snowflake),
+  applicationId: option(snowflake),
+  parentId: option(option(snowflake)),
+  lastPinTimestamp: option(Js.Date.t),
+  /* todo: permission_overwrites */
 };
 
 type guild = {

@@ -1,15 +1,6 @@
 open PayloadTypes;
 open Types;
 
-let channel = (json): channel => {
-  Json.Decode.{
-    id: json |> field("id", string),
-    type_: json |> field("type", int),
-    guildId: json |> optional(field("guild_id", string)),
-    name: json |> optional(field("name", string)),
-  };
-};
-
 let user = (json): user => {
   Json.Decode.{
     id: json |> field("id", string),
@@ -23,6 +14,30 @@ let user = (json): user => {
     email: json |> optional(field("email", string)),
     flags: json |> optional(field("flags", int)),
     premiumType: json |> optional(field("premium_type", int)),
+  };
+};
+
+let channel = (json): channel => {
+  Json.Decode.{
+    id: json |> field("id", string),
+    type_:
+      json |> field("type", int) |> channelTypeFromJs |> Belt.Option.getExn,
+    guildId: json |> optional(field("guild_id", string)),
+    position: json |> optional(field("position", int)),
+    name: json |> optional(field("name", string)),
+    topic: json |> optional(field("topic", string)),
+    nsfw: json |> optional(field("nsfw", bool)),
+    lastMessageId:
+      json |> optional(field("lastMessageId", optional(string))),
+    bitrate: json |> optional(field("bitrate", int)),
+    userLimit: json |> optional(field("userLimit", int)),
+    rateLimitPerUser: json |> optional(field("rateLimitPerUser", int)),
+    recipients: json |> optional(field("recipients", array(user))),
+    icon: json |> optional(field("icon", optional(string))),
+    ownerId: json |> optional(field("ownerId", string)),
+    applicationId: json |> optional(field("applicationId", string)),
+    parentId: json |> optional(field("parentId", optional(string))),
+    lastPinTimestamp: json |> optional(field("lastPinTimestamp", date)),
   };
 };
 

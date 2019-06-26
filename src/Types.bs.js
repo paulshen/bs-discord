@@ -64,6 +64,17 @@ function statusFromJs(param) {
   return Js_mapperRt.revSearch(4, jsMapperConstantArray$1, param);
 }
 
+function channelTypeToJs(param) {
+  return param + 0 | 0;
+}
+
+function channelTypeFromJs(param) {
+  if (param <= 6 && 0 <= param) {
+    return param - 0 | 0;
+  }
+  
+}
+
 function messageTypeToJs(param) {
   return param + 0 | 0;
 }
@@ -81,6 +92,8 @@ exports.clientStatusTypeToJs = clientStatusTypeToJs;
 exports.clientStatusTypeFromJs = clientStatusTypeFromJs;
 exports.statusToJs = statusToJs;
 exports.statusFromJs = statusFromJs;
+exports.channelTypeToJs = channelTypeToJs;
+exports.channelTypeFromJs = channelTypeFromJs;
 exports.messageTypeToJs = messageTypeToJs;
 exports.messageTypeFromJs = messageTypeFromJs;
 /* No side effect */
