@@ -34,11 +34,13 @@ let handleMessage = message => {
   switch (message) {
   | Hello(payload) =>
     Js.Global.setInterval(
-      () =>
+      () => {
+        Js.log("heartbeat");
         Websocket.send(
           ws,
           Js.Json.stringify(hackType({"op": opCodeToJs(Heartbeat)})),
-        ),
+        );
+      },
       payload.heartbeatInterval,
     )
     |> ignore
@@ -67,4 +69,4 @@ Websocket.onError(
     Websocket.close(ws);
   },
 );
-Websocket.onClose(ws, ev => Js.log({j|onClose: $ev|j}));
+Websocket.onClose(ws, ev => Js.log2("onClose", ev));

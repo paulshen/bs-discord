@@ -30,6 +30,7 @@ function handleMessage(message) {
     return /* () */0;
   } else {
     setInterval((function (param) {
+            console.log("heartbeat");
             return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
                             op: PayloadTypes$BsDiscord.opCodeToJs(/* Heartbeat */1)
                           }));
@@ -52,7 +53,7 @@ WebsocketClient$BsDiscord.Websocket[/* onError */5](ws, (function (ev) {
       }));
 
 WebsocketClient$BsDiscord.Websocket[/* onClose */6](ws, (function (ev) {
-        console.log("onClose: " + (String(ev) + ""));
+        console.log("onClose", ev);
         return /* () */0;
       }));
 

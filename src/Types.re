@@ -18,6 +18,7 @@ type guildMember = {
   user,
   nick: option(string),
   roles: array(snowflake),
+  /* todo */
 };
 
 type channel = {
@@ -25,6 +26,7 @@ type channel = {
   type_: int,
   guildId: option(snowflake),
   name: option(string),
+  /* todo */
 };
 
 type guild = {
@@ -36,6 +38,7 @@ type guild = {
   ownerId: snowflake,
   members: option(array(guildMember)),
   channels: option(array(channel)),
+  /* todo */
 };
 
 type unavailableGuild = {
@@ -69,4 +72,5 @@ type message = {
   tts: bool,
   mentionEveryone: bool,
   type_: int,
+  /* todo */
 };
