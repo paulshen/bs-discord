@@ -115,7 +115,7 @@ let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
     channelId: json |> field("channel_id", string),
-    guildId: json |> field("guild_id", string),
+    guildId: json |> optional(field("guild_id", string)),
     author: json |> field("author", user), /* TODO: handle webhook */
     content: json |> field("content", string),
     timestamp: json |> field("timestamp", date),

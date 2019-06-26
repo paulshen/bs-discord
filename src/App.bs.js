@@ -3,10 +3,14 @@
 
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
+var Constants$BsDiscord = require("./Constants.bs.js");
+var ChannelApi$BsDiscord = require("./api/ChannelApi.bs.js");
 var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 var PayloadParser$BsDiscord = require("./PayloadParser.bs.js");
 var PresenceStore$BsDiscord = require("./state/PresenceStore.bs.js");
 var WebsocketClient$BsDiscord = require("./WebsocketClient.bs.js");
+
+((require('isomorphic-fetch')));
 
 var Unsupported = Caml_exceptions.create("App-BsDiscord.Unsupported");
 
@@ -16,13 +20,11 @@ var sessionId = /* record */[/* contents */undefined];
 
 var lastSequenceId = /* record */[/* contents */undefined];
 
-var token = "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k";
-
 function identify(param) {
   return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
                   op: PayloadTypes$BsDiscord.opCodeToJs(/* Identify */2),
                   d: {
-                    token: token,
+                    token: Constants$BsDiscord.token,
                     properties: {
                       $os: "darwin",
                       $browser: "bs-discord",
@@ -37,7 +39,7 @@ function resume(sessionId) {
   return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
                   op: PayloadTypes$BsDiscord.opCodeToJs(/* Resume */5),
                   d: {
-                    token: token,
+                    token: Constants$BsDiscord.token,
                     session_id: sessionId,
                     seq: match !== undefined ? match : null
                   }
@@ -74,7 +76,9 @@ function handleMessage(message) {
               return /* () */0;
             }
         case 3 : 
-            return PresenceStore$BsDiscord.updatePresence(match[0]);
+            PresenceStore$BsDiscord.updatePresence(match[0]);
+            ChannelApi$BsDiscord.createMessage("546759559973175321", "hello");
+            return /* () */0;
         default:
           return /* () */0;
       }
@@ -121,8 +125,7 @@ exports.Unsupported = Unsupported;
 exports.ws = ws;
 exports.sessionId = sessionId;
 exports.lastSequenceId = lastSequenceId;
-exports.token = token;
 exports.identify = identify;
 exports.resume = resume;
 exports.handleMessage = handleMessage;
-/* ws Not a pure module */
+/*  Not a pure module */

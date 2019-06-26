@@ -200,7 +200,9 @@ function message(json) {
   return /* record */[
           /* id */Json_decode.field("id", Json_decode.string, json),
           /* channelId */Json_decode.field("channel_id", Json_decode.string, json),
-          /* guildId */Json_decode.field("guild_id", Json_decode.string, json),
+          /* guildId */Json_decode.optional((function (param) {
+                  return Json_decode.field("guild_id", Json_decode.string, param);
+                }), json),
           /* author */Json_decode.field("author", user, json),
           /* content */Json_decode.field("content", Json_decode.string, json),
           /* timestamp */Json_decode.field("timestamp", Json_decode.date, json),

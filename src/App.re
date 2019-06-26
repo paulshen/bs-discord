@@ -1,3 +1,4 @@
+[%raw "require('isomorphic-fetch')"];
 open PayloadTypes;
 open WebsocketClient;
 
@@ -10,7 +11,6 @@ let ws: Websocket.t(string) =
 let sessionId: ref(option(string)) = ref(None);
 let lastSequenceId: ref(option(int)) = ref(None);
 
-let token = "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k";
 let identify = () => {
   Websocket.send(
     ws,
@@ -18,7 +18,7 @@ let identify = () => {
       hackType({
         "op": opCodeToJs(Identify),
         "d": {
-          "token": token,
+          "token": Constants.token,
           "properties": {
             "$os": "darwin",
             "$browser": "bs-discord",
@@ -36,7 +36,7 @@ let resume = sessionId => {
       hackType({
         "op": opCodeToJs(Resume),
         "d": {
-          "token": token,
+          "token": Constants.token,
           "session_id": sessionId,
           "seq":
             switch (lastSequenceId^) {
@@ -93,7 +93,8 @@ let handleMessage = message => {
     | None => ()
     }
   | Dispatch(PresenceUpdate(presenceUpdate)) =>
-    PresenceStore.updatePresence(presenceUpdate)
+    PresenceStore.updatePresence(presenceUpdate);
+    ChannelApi.createMessage("546759559973175321", "hello") |> ignore;
   | _ => ()
   };
 };

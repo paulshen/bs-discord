@@ -121,8 +121,8 @@ type messageType =
 type message = {
   id: snowflake,
   channelId: snowflake,
-  guildId: snowflake,
-  author: user,
+  guildId: option(snowflake),
+  author: user, /* todo: handle webhook */
   content: string,
   timestamp: Js.Date.t,
   editedTimestamp: option(Js.Date.t),
