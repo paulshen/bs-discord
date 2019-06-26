@@ -22,7 +22,7 @@ function onMessage(message) {
       return /* () */0;
     } else {
       var message$1 = match[0];
-      if ("ping".indexOf(message$1[/* content */4]) !== -1) {
+      if ("ping".indexOf(message$1[/* content */5]) !== -1) {
         ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
         return /* () */0;
       } else {

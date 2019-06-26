@@ -23,6 +23,15 @@ type guildMember = {
   deaf: bool,
   mute: bool,
 };
+type partialGuildMember = {
+  user,
+  nick: option(string),
+  roles: option(array(snowflake)),
+  joinedAt: option(Js.Date.t),
+  premiumSince: option(option(Js.Date.t)),
+  deaf: option(bool),
+  mute: option(bool),
+};
 
 [@bs.deriving jsConverter]
 type activityType =
@@ -125,6 +134,22 @@ type unavailableGuild = {
   unavailable: bool,
 };
 
+type emoji = {
+  id: option(snowflake),
+  name: string,
+  user: option(user),
+  requireColons: option(bool),
+  managed: option(bool),
+  animated: option(bool),
+  /* todo: roles */
+};
+
+type messageReaction = {
+  count: int,
+  me: bool,
+  emoji,
+};
+
 [@bs.deriving jsConverter]
 type messageType =
   | [@bs.as 0] Default
@@ -139,17 +164,22 @@ type messageType =
   | [@bs.as 9] UserPremiumGuildSubscriptionTier1
   | [@bs.as 10] UserPremiumGuildSubscriptionTier2
   | [@bs.as 11] UserPremiumGuildSubscriptionTier3;
-
 type message = {
   id: snowflake,
   channelId: snowflake,
   guildId: option(snowflake),
   author: user, /* todo: handle webhook */
+  member: option(partialGuildMember),
   content: string,
   timestamp: Js.Date.t,
   editedTimestamp: option(Js.Date.t),
   tts: bool,
   mentionEveryone: bool,
-  type_: int,
-  /* todo */
+  mentionRoles: array(snowflake),
+  reactions: option(array(messageReaction)),
+  nonce: option(option(snowflake)),
+  pinned: bool,
+  webhookId: option(snowflake),
+  type_: messageType,
+  /* todo: mentions, attachments, embeds, activity, application */
 };

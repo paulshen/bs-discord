@@ -118,6 +118,34 @@ function guildMember(json) {
         ];
 }
 
+function partialGuildMember(json) {
+  return /* record */[
+          /* user */Json_decode.field("user", user, json),
+          /* nick */Json_decode.optional((function (param) {
+                  return Json_decode.field("nick", Json_decode.string, param);
+                }), json),
+          /* roles */Json_decode.optional((function (param) {
+                  return Json_decode.field("roles", (function (param) {
+                                return Json_decode.array(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* joinedAt */Json_decode.optional((function (param) {
+                  return Json_decode.field("joined_at", Json_decode.date, param);
+                }), json),
+          /* premiumSince */Json_decode.optional((function (param) {
+                  return Json_decode.field("premium_since", (function (param) {
+                                return Json_decode.optional(Json_decode.date, param);
+                              }), param);
+                }), json),
+          /* deaf */Json_decode.optional((function (param) {
+                  return Json_decode.field("deaf", Json_decode.bool, param);
+                }), json),
+          /* mute */Json_decode.optional((function (param) {
+                  return Json_decode.field("mute", Json_decode.bool, param);
+                }), json)
+        ];
+}
+
 function presenceUser(json) {
   return /* record */[/* id */Json_decode.field("id", Json_decode.string, json)];
 }
@@ -243,6 +271,35 @@ function unavailableGuild(json) {
         ];
 }
 
+function emoji(json) {
+  return /* record */[
+          /* id */Json_decode.field("id", (function (param) {
+                  return Json_decode.optional(Json_decode.string, param);
+                }), json),
+          /* name */Json_decode.field("name", Json_decode.string, json),
+          /* user */Json_decode.optional((function (param) {
+                  return Json_decode.field("user", user, param);
+                }), json),
+          /* requireColons */Json_decode.optional((function (param) {
+                  return Json_decode.field("require_colons", Json_decode.bool, param);
+                }), json),
+          /* managed */Json_decode.optional((function (param) {
+                  return Json_decode.field("managed", Json_decode.bool, param);
+                }), json),
+          /* animated */Json_decode.optional((function (param) {
+                  return Json_decode.field("animated", Json_decode.bool, param);
+                }), json)
+        ];
+}
+
+function messageReaction(json) {
+  return /* record */[
+          /* count */Json_decode.field("count", Json_decode.$$int, json),
+          /* me */Json_decode.field("me", Json_decode.bool, json),
+          /* emoji */Json_decode.field("emoji", emoji, json)
+        ];
+}
+
 function message(json) {
   return /* record */[
           /* id */Json_decode.field("id", Json_decode.string, json),
@@ -251,6 +308,9 @@ function message(json) {
                   return Json_decode.field("guild_id", Json_decode.string, param);
                 }), json),
           /* author */Json_decode.field("author", user, json),
+          /* member */Json_decode.optional((function (param) {
+                  return Json_decode.field("member", partialGuildMember, param);
+                }), json),
           /* content */Json_decode.field("content", Json_decode.string, json),
           /* timestamp */Json_decode.field("timestamp", Json_decode.date, json),
           /* editedTimestamp */Json_decode.field("edited_timestamp", (function (param) {
@@ -258,7 +318,24 @@ function message(json) {
                 }), json),
           /* tts */Json_decode.field("tts", Json_decode.bool, json),
           /* mentionEveryone */Json_decode.field("mention_everyone", Json_decode.bool, json),
-          /* type_ */Json_decode.field("type", Json_decode.$$int, json)
+          /* mentionRoles */Json_decode.field("mention_roles", (function (param) {
+                  return Json_decode.array(Json_decode.string, param);
+                }), json),
+          /* reactions */Json_decode.optional((function (param) {
+                  return Json_decode.field("reactions", (function (param) {
+                                return Json_decode.array(messageReaction, param);
+                              }), param);
+                }), json),
+          /* nonce */Json_decode.optional((function (param) {
+                  return Json_decode.field("nonce", (function (param) {
+                                return Json_decode.optional(Json_decode.string, param);
+                              }), param);
+                }), json),
+          /* pinned */Json_decode.field("pinned", Json_decode.bool, json),
+          /* webhookId */Json_decode.optional((function (param) {
+                  return Json_decode.field("webhookId", Json_decode.string, param);
+                }), json),
+          /* type_ */Belt_Option.getExn(Types$BsDiscord.messageTypeFromJs(Json_decode.field("type", Json_decode.$$int, json)))
         ];
 }
 
@@ -321,6 +398,7 @@ function parseSocketData(json) {
 exports.user = user;
 exports.channel = channel;
 exports.guildMember = guildMember;
+exports.partialGuildMember = partialGuildMember;
 exports.presenceUser = presenceUser;
 exports.unwrapOption = unwrapOption;
 exports.activity = activity;
@@ -328,6 +406,8 @@ exports.clientStatus = clientStatus;
 exports.presenceUpdate = presenceUpdate;
 exports.guild = guild;
 exports.unavailableGuild = unavailableGuild;
+exports.emoji = emoji;
+exports.messageReaction = messageReaction;
 exports.message = message;
 exports.readyPayload = readyPayload;
 exports.helloPayload = helloPayload;

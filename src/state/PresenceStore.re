@@ -10,7 +10,8 @@ let getOptionalUpdate = (value: option('a), default: option('a)) =>
     default;
   };
 
-let updatePresence = (state: State.presenceState, presenceUpdate) => {
+let updatePresence =
+    (state: State.presenceState, presenceUpdate: presenceUpdate) => {
   let userId = presenceUpdate.user.id;
   open Belt.Map.String;
   let newPresence =

@@ -52,6 +52,17 @@ let guildMember = (json): guildMember => {
     mute: json |> field("mute", bool),
   };
 };
+let partialGuildMember = (json): partialGuildMember => {
+  Json.Decode.{
+    user: json |> field("user", user),
+    nick: json |> optional(field("nick", string)),
+    roles: json |> optional(field("roles", array(string))),
+    joinedAt: json |> optional(field("joined_at", date)),
+    premiumSince: json |> optional(field("premium_since", optional(date))),
+    deaf: json |> optional(field("deaf", bool)),
+    mute: json |> optional(field("mute", bool)),
+  };
+};
 
 let presenceUser = (json): presenceUser => {
   Json.Decode.{id: json |> field("id", string)};
@@ -126,18 +137,44 @@ let unavailableGuild = (json): unavailableGuild => {
   };
 };
 
+let emoji = (json): emoji => {
+  Json.Decode.{
+    id: json |> field("id", optional(string)),
+    name: json |> field("name", string),
+    user: json |> optional(field("user", user)),
+    requireColons: json |> optional(field("require_colons", bool)),
+    managed: json |> optional(field("managed", bool)),
+    animated: json |> optional(field("animated", bool)),
+  };
+};
+
+let messageReaction = (json): messageReaction => {
+  Json.Decode.{
+    count: json |> field("count", int),
+    me: json |> field("me", bool),
+    emoji: json |> field("emoji", emoji),
+  };
+};
+
 let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
     channelId: json |> field("channel_id", string),
     guildId: json |> optional(field("guild_id", string)),
     author: json |> field("author", user), /* TODO: handle webhook */
+    member: json |> optional(field("member", partialGuildMember)),
     content: json |> field("content", string),
     timestamp: json |> field("timestamp", date),
     editedTimestamp: json |> field("edited_timestamp", optional(date)),
     tts: json |> field("tts", bool),
     mentionEveryone: json |> field("mention_everyone", bool),
-    type_: json |> field("type", int),
+    mentionRoles: json |> field("mention_roles", array(string)),
+    reactions: json |> optional(field("reactions", array(messageReaction))),
+    nonce: json |> optional(field("nonce", optional(string))),
+    pinned: json |> field("pinned", bool),
+    webhookId: json |> optional(field("webhookId", string)),
+    type_:
+      json |> field("type", int) |> messageTypeFromJs |> Belt.Option.getExn,
   };
 };
 
