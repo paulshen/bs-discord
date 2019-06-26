@@ -15,11 +15,7 @@ type opCode =
   | [@bs.as 10] Hello
   | [@bs.as 11] HeartbeatAck;
 
-[@bs.deriving abstract]
-type helloMessageData = {
-  [@bs.as "heartbeat_interval"]
-  heartbeatInterval: int,
-};
+type helloMessageData = {heartbeatInterval: int};
 
 [@bs.deriving jsConverter]
 type dispatchMessageType = [
@@ -59,7 +55,15 @@ exception Unsupported;
 external hackType: 'a => 'b = "%identity";
 let parseMessage = messageData => {
   switch (Belt.Option.getExn(opCodeFromJs(opGet(messageData)))) {
-  | Hello => Hello(hackType(dGet(messageData)))
+  | Hello =>
+    Hello(
+      {
+        let json = dGet(messageData);
+        Json.Decode.{
+          heartbeatInterval: field("heartbeat_interval", int, json),
+        };
+      },
+    )
   | InvalidSession => InvalidSession
   | Dispatch =>
     Dispatch(
@@ -114,7 +118,7 @@ let handleMessage = message => {
           ws,
           Js.Json.stringify(hackType({"op": opCodeToJs(Heartbeat)})),
         ),
-      heartbeatIntervalGet(payload),
+      payload.heartbeatInterval,
     )
     |> ignore
   | _ => ()

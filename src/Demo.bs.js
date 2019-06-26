@@ -4,6 +4,7 @@
 var Block = require("bs-platform/lib/js/block.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Js_mapperRt = require("bs-platform/lib/js/js_mapperRt.js");
+var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
 var WebsocketClient$BsDiscord = require("./WebsocketClient.bs.js");
 
@@ -72,7 +73,8 @@ function parseMessage(messageData) {
     case 8 : 
         return /* InvalidSession */0;
     case 9 : 
-        return /* Hello */Block.__(0, [messageData.d]);
+        var json = messageData.d;
+        return /* Hello */Block.__(0, [/* record */[/* heartbeatInterval */Json_decode.field("heartbeat_interval", Json_decode.$$int, json)]]);
     case 1 : 
     case 2 : 
     case 3 : 
@@ -111,7 +113,7 @@ function handleMessage(message) {
             return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
                             op: opCodeToJs(/* Heartbeat */1)
                           }));
-          }), message[0].heartbeat_interval);
+          }), message[0][/* heartbeatInterval */0]);
     return /* () */0;
   }
 }
