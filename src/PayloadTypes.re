@@ -14,7 +14,7 @@ type opCode =
   | [@bs.as 10] Hello
   | [@bs.as 11] HeartbeatAck;
 
-type helloMessageData = {heartbeatInterval: int};
+type helloPayload = {heartbeatInterval: int};
 
 [@bs.deriving jsConverter]
 type dispatchMessageType = [
@@ -23,9 +23,7 @@ type dispatchMessageType = [
   | [@bs.as "MESSAGE_CREATE"] `MessageCreate
 ];
 
-[@bs.deriving abstract]
 type readyPayload = {
-  [@bs.as "session_id"]
   sessionId: string,
   user,
   guilds: array(unavailableGuild),
@@ -37,15 +35,8 @@ type dispatchMessage =
   | MessageCreate(message)
   | Unknown;
 
-[@bs.deriving abstract]
-type messageData = {
-  t: option(string),
-  op: int,
-  d: Js.Json.t,
-};
-
-type message =
-  | Hello(helloMessageData)
+type socketMessage =
+  | Hello(helloPayload)
   | Dispatch(dispatchMessage)
   | InvalidSession
   | Unknown;

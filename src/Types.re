@@ -1,62 +1,43 @@
 type snowflake = string;
 
-[@bs.deriving abstract]
 type user = {
   id: snowflake,
   username: string,
   discriminator: string,
   avatar: option(string),
-  [@bs.optional]
-  bot: bool,
-  [@bs.optional] [@bs.as "mfa_enabled"]
-  mfaEnabled: bool,
-  [@bs.optional]
-  locale: string,
-  [@bs.optional]
-  verified: bool,
-  [@bs.optional]
-  email: string,
-  [@bs.optional]
-  flags: int,
-  [@bs.optional] [@bs.as "premium_type"]
-  premiumType: int,
+  bot: option(bool),
+  mfaEnabled: option(bool),
+  locale: option(string),
+  verified: option(bool),
+  email: option(string),
+  flags: option(int),
+  premiumType: option(int),
 };
 
-[@bs.deriving abstract]
 type guildMember = {
   user,
-  [@bs.optional]
-  nick: string,
+  nick: option(string),
   roles: array(snowflake),
 };
 
-[@bs.deriving abstract]
 type channel = {
   id: snowflake,
-  [@bs.as "type"]
   type_: int,
-  [@bs.optional] [@bs.as "guild_id"]
-  guildId: snowflake,
-  [@bs.optional]
-  name: string,
+  guildId: option(snowflake),
+  name: option(string),
 };
 
-[@bs.deriving abstract]
 type guild = {
   id: snowflake,
   name: string,
   icon: option(string),
   splash: option(string),
-  [@bs.optional]
-  owner: bool,
-  owner_id: string,
-  [@bs.optional]
-  members: array(guildMember),
-  [@bs.optional]
-  channels: array(channel),
+  owner: option(bool),
+  ownerId: snowflake,
+  members: option(array(guildMember)),
+  channels: option(array(channel)),
 };
 
-[@bs.deriving abstract]
 type unavailableGuild = {
   id: snowflake,
   unavailable: bool,
@@ -77,19 +58,15 @@ type messageType =
   | [@bs.as 10] UserPremiumGuildSubscriptionTier2
   | [@bs.as 11] UserPremiumGuildSubscriptionTier3;
 
-[@bs.deriving abstract]
 type message = {
   id: snowflake,
-  [@bs.as "channel_id"]
   channelId: snowflake,
-  [@bs.as "guild_id"]
   guildId: snowflake,
-  author: user, /* TODO: handle webhook */
+  author: user,
   content: string,
-  timestamp: string,
-  edited_timestamp: option(string),
+  timestamp: Js.Date.t,
+  editedTimestamp: option(Js.Date.t),
   tts: bool,
-  mention_everyone: bool,
-  [@bs.as "type"]
+  mentionEveryone: bool,
   type_: int,
 };
