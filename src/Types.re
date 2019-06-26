@@ -63,7 +63,7 @@ type presence = {
 type presenceUpdate = {
   user: presenceUser,
   roles: option(array(snowflake)),
-  game: option(activity),
+  game: option(option(activity)),
   guildId: option(snowflake),
   status: option(string),
   activities: option(array(activity)),

@@ -78,7 +78,7 @@ let presenceUpdate = (json): presenceUpdate => {
   Json.Decode.{
     user: json |> field("user", presenceUser),
     roles: json |> optional(field("roles", array(string))),
-    game: json |> optional(field("game", activity)),
+    game: json |> optional(field("game", optional(activity))),
     guildId: json |> optional(field("guild_id", string)),
     status: json |> optional(field("status", string)),
     activities: json |> optional(field("activities", array(activity))),

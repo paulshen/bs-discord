@@ -86,8 +86,12 @@ let handleMessage = message => {
     )
     |> ignore
   | Dispatch(Ready(readyPayload)) =>
-    sessionId := Some(readyPayload.sessionId);
-    ();
+    sessionId := Some(readyPayload.sessionId)
+  | Dispatch(GuildCreate(guild)) =>
+    switch (guild.presences) {
+    | Some(presences) => PresenceStore.updatePresences(presences)
+    | None => ()
+    }
   | _ => ()
   };
 };

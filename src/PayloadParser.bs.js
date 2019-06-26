@@ -134,7 +134,9 @@ function presenceUpdate(json) {
                               }), param);
                 }), json),
           /* game */Json_decode.optional((function (param) {
-                  return Json_decode.field("game", activity, param);
+                  return Json_decode.field("game", (function (param) {
+                                return Json_decode.optional(activity, param);
+                              }), param);
                 }), json),
           /* guildId */Json_decode.optional((function (param) {
                   return Json_decode.field("guild_id", Json_decode.string, param);

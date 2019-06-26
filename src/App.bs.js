@@ -5,6 +5,7 @@ var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
 var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 var PayloadParser$BsDiscord = require("./PayloadParser.bs.js");
+var PresenceStore$BsDiscord = require("./state/PresenceStore.bs.js");
 var WebsocketClient$BsDiscord = require("./WebsocketClient.bs.js");
 
 var Unsupported = Caml_exceptions.create("App-BsDiscord.Unsupported");
@@ -58,11 +59,23 @@ function handleMessage(message) {
     return /* () */0;
   } else if (message.tag) {
     var match = message[0];
-    if (typeof match === "number" || match.tag) {
+    if (typeof match === "number") {
       return /* () */0;
     } else {
-      sessionId[0] = match[0][/* sessionId */0];
-      return /* () */0;
+      switch (match.tag | 0) {
+        case 0 : 
+            sessionId[0] = match[0][/* sessionId */0];
+            return /* () */0;
+        case 1 : 
+            var match$1 = match[0][/* presences */8];
+            if (match$1 !== undefined) {
+              return PresenceStore$BsDiscord.updatePresences(match$1);
+            } else {
+              return /* () */0;
+            }
+        default:
+          return /* () */0;
+      }
     }
   } else {
     setInterval((function (param) {
