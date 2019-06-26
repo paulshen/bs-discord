@@ -105,6 +105,22 @@ Websocket.onOpen(
   },
 );
 
+let handleMessage = message => {
+  switch (message) {
+  | Hello(payload) =>
+    Js.Global.setInterval(
+      () =>
+        Websocket.send(
+          ws,
+          Js.Json.stringify(hackType({"op": opCodeToJs(Heartbeat)})),
+        ),
+      heartbeatIntervalGet(payload),
+    )
+    |> ignore
+  | _ => ()
+  };
+};
+
 [@bs.scope "JSON"] [@bs.val]
 external parseIntoMessageData: string => messageData = "parse";
 Websocket.onMessage(
@@ -113,6 +129,7 @@ Websocket.onMessage(
     Js.log(MessageEvent.data(ev));
     let message = ev->MessageEvent.data->parseIntoMessageData->parseMessage;
     Js.log2("onMessage", message);
+    handleMessage(message);
     ();
   },
 );

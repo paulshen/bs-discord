@@ -103,10 +103,24 @@ WebsocketClient$BsDiscord.Websocket[/* onOpen */4](ws, (function (param) {
                       }));
       }));
 
+function handleMessage(message) {
+  if (typeof message === "number" || message.tag) {
+    return /* () */0;
+  } else {
+    setInterval((function (param) {
+            return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
+                            op: opCodeToJs(/* Heartbeat */1)
+                          }));
+          }), message[0].heartbeat_interval);
+    return /* () */0;
+  }
+}
+
 WebsocketClient$BsDiscord.Websocket[/* onMessage */7](ws, (function (ev) {
         console.log(ev.data);
         var message = parseMessage(JSON.parse(ev.data));
         console.log("onMessage", message);
+        handleMessage(message);
         return /* () */0;
       }));
 
@@ -127,4 +141,5 @@ exports.dispatchMessageTypeFromJs = dispatchMessageTypeFromJs;
 exports.Unsupported = Unsupported;
 exports.parseMessage = parseMessage;
 exports.ws = ws;
+exports.handleMessage = handleMessage;
 /* ws Not a pure module */
