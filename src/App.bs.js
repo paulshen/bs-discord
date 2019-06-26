@@ -11,26 +11,59 @@ var Unsupported = Caml_exceptions.create("App-BsDiscord.Unsupported");
 
 var ws = WebsocketClient$BsDiscord.Websocket[/* make */2](undefined, "wss://gateway.discord.gg/?v=6&encoding=json");
 
-WebsocketClient$BsDiscord.Websocket[/* onOpen */4](ws, (function (param) {
-        console.log("onOpen");
-        return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
-                        op: PayloadTypes$BsDiscord.opCodeToJs(/* Identify */2),
-                        d: {
-                          token: "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k",
-                          properties: {
-                            $os: "darwin",
-                            $browser: "bs-discord",
-                            $device: "bs-discord"
-                          }
-                        }
-                      }));
-      }));
+var sessionId = /* record */[/* contents */undefined];
 
 var lastSequenceId = /* record */[/* contents */undefined];
 
+var token = "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k";
+
+function identify(param) {
+  return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
+                  op: PayloadTypes$BsDiscord.opCodeToJs(/* Identify */2),
+                  d: {
+                    token: token,
+                    properties: {
+                      $os: "darwin",
+                      $browser: "bs-discord",
+                      $device: "bs-discord"
+                    }
+                  }
+                }));
+}
+
+function resume(sessionId) {
+  var match = lastSequenceId[0];
+  return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
+                  op: PayloadTypes$BsDiscord.opCodeToJs(/* Resume */5),
+                  d: {
+                    token: token,
+                    session_id: sessionId,
+                    seq: match !== undefined ? match : null
+                  }
+                }));
+}
+
+WebsocketClient$BsDiscord.Websocket[/* onOpen */4](ws, (function (param) {
+        console.log("onOpen");
+        var match = sessionId[0];
+        if (match !== undefined) {
+          return resume(match);
+        } else {
+          return identify(/* () */0);
+        }
+      }));
+
 function handleMessage(message) {
-  if (typeof message === "number" || message.tag) {
+  if (typeof message === "number") {
     return /* () */0;
+  } else if (message.tag) {
+    var match = message[0];
+    if (typeof match === "number" || match.tag) {
+      return /* () */0;
+    } else {
+      sessionId[0] = match[0][/* sessionId */0];
+      return /* () */0;
+    }
   } else {
     setInterval((function (param) {
             console.log("heartbeat");
@@ -71,6 +104,10 @@ WebsocketClient$BsDiscord.Websocket[/* onClose */6](ws, (function (ev) {
 
 exports.Unsupported = Unsupported;
 exports.ws = ws;
+exports.sessionId = sessionId;
 exports.lastSequenceId = lastSequenceId;
+exports.token = token;
+exports.identify = identify;
+exports.resume = resume;
 exports.handleMessage = handleMessage;
 /* ws Not a pure module */

@@ -7,30 +7,60 @@ external hackType: 'a => 'b = "%identity";
 let ws: Websocket.t(string) =
   Websocket.make("wss://gateway.discord.gg/?v=6&encoding=json");
 
+let sessionId: ref(option(string)) = ref(None);
+let lastSequenceId: ref(option(int)) = ref(None);
+
+let token = "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k";
+let identify = () => {
+  Websocket.send(
+    ws,
+    Js.Json.stringify(
+      hackType({
+        "op": opCodeToJs(Identify),
+        "d": {
+          "token": token,
+          "properties": {
+            "$os": "darwin",
+            "$browser": "bs-discord",
+            "$device": "bs-discord",
+          },
+        },
+      }),
+    ),
+  );
+};
+let resume = sessionId => {
+  Websocket.send(
+    ws,
+    Js.Json.stringify(
+      hackType({
+        "op": opCodeToJs(Resume),
+        "d": {
+          "token": token,
+          "session_id": sessionId,
+          "seq":
+            switch (lastSequenceId^) {
+            | Some(heartbeatSequence) =>
+              Js.Nullable.return(heartbeatSequence)
+            | None => Js.Nullable.null
+            },
+        },
+      }),
+    ),
+  );
+};
+
 Websocket.onOpen(
   ws,
   _ => {
     Js.log("onOpen");
-    Websocket.send(
-      ws,
-      Js.Json.stringify(
-        hackType({
-          "op": opCodeToJs(Identify),
-          "d": {
-            "token": "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k",
-            "properties": {
-              "$os": "darwin",
-              "$browser": "bs-discord",
-              "$device": "bs-discord",
-            },
-          },
-        }),
-      ),
-    );
+    switch (sessionId^) {
+    | Some(sessionId) => resume(sessionId)
+    | None => identify()
+    };
   },
 );
 
-let lastSequenceId: ref(option(int)) = ref(None);
 let handleMessage = message => {
   switch (message) {
   | Hello(payload) =>
@@ -55,6 +85,9 @@ let handleMessage = message => {
       payload.heartbeatInterval,
     )
     |> ignore
+  | Dispatch(Ready(readyPayload)) =>
+    sessionId := Some(readyPayload.sessionId);
+    ();
   | _ => ()
   };
 };

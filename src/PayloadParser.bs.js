@@ -128,6 +128,12 @@ function helloPayload(json) {
   return /* record */[/* heartbeatInterval */Json_decode.field("heartbeat_interval", Json_decode.$$int, json)];
 }
 
+function resumePayload(json) {
+  return /* record */[/* trace */Json_decode.field("_trace", (function (param) {
+                  return Json_decode.array(Json_decode.string, param);
+                }), json)];
+}
+
 function parseSocketData(json) {
   var match = Belt_Option.getExn(PayloadTypes$BsDiscord.opCodeFromJs(Json_decode.field("op", Json_decode.$$int, json)));
   switch (match) {
@@ -136,9 +142,11 @@ function parseSocketData(json) {
         var tmp;
         if (match$1 !== undefined) {
           var match$2 = match$1;
-          tmp = match$2 !== 889912559 ? (
-              match$2 >= 975859715 ? /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
-            ) : /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]);
+          tmp = match$2 >= 975859715 ? (
+              match$2 >= 1025039821 ? /* Resume */Block.__(3, [Json_decode.field("d", resumePayload, json)]) : /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)])
+            ) : (
+              match$2 >= 889912559 ? /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
+            );
         } else {
           tmp = /* Unknown */0;
         }
@@ -168,5 +176,6 @@ exports.unavailableGuild = unavailableGuild;
 exports.message = message;
 exports.readyPayload = readyPayload;
 exports.helloPayload = helloPayload;
+exports.resumePayload = resumePayload;
 exports.parseSocketData = parseSocketData;
 /* No side effect */

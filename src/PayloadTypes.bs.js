@@ -37,15 +37,19 @@ var jsMapperConstantArray$1 = /* array */[
   /* tuple */[
     975859715,
     "MESSAGE_CREATE"
+  ],
+  /* tuple */[
+    1025039821,
+    "RESUMED"
   ]
 ];
 
 function dispatchMessageTypeToJs(param) {
-  return Js_mapperRt.binarySearch(3, param, jsMapperConstantArray$1);
+  return Js_mapperRt.binarySearch(4, param, jsMapperConstantArray$1);
 }
 
 function dispatchMessageTypeFromJs(param) {
-  return Js_mapperRt.revSearch(3, jsMapperConstantArray$1, param);
+  return Js_mapperRt.revSearch(4, jsMapperConstantArray$1, param);
 }
 
 exports.opCodeToJs = opCodeToJs;

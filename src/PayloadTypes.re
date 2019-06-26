@@ -21,18 +21,23 @@ type dispatchMessageType = [
   | [@bs.as "READY"] `Ready
   | [@bs.as "GUILD_CREATE"] `GuildCreate
   | [@bs.as "MESSAGE_CREATE"] `MessageCreate
+  | [@bs.as "RESUMED"] `Resume
 ];
 
 type readyPayload = {
   sessionId: string,
   user,
   guilds: array(unavailableGuild),
+  /* todo */
 };
+
+type resumedPayload = {trace: array(string)};
 
 type dispatchMessage =
   | Ready(readyPayload)
   | GuildCreate(guild)
   | MessageCreate(message)
+  | Resume(resumedPayload)
   | Unknown;
 
 type socketMessage =

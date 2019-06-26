@@ -81,6 +81,10 @@ let helloPayload = (json): helloPayload => {
   Json.Decode.{heartbeatInterval: field("heartbeat_interval", int, json)};
 };
 
+let resumePayload = (json): resumedPayload => {
+  Json.Decode.{trace: field("_trace", array(string), json)};
+};
+
 let parseSocketData = json => {
   Json.Decode.(
     switch (Belt.Option.getExn(opCodeFromJs(field("op", int, json)))) {
@@ -91,6 +95,7 @@ let parseSocketData = json => {
         | Some(`Ready) => Ready(field("d", readyPayload, json))
         | Some(`GuildCreate) => GuildCreate(field("d", guild, json))
         | Some(`MessageCreate) => MessageCreate(field("d", message, json))
+        | Some(`Resume) => Resume(field("d", resumePayload, json))
         | None => Unknown
         },
       )
