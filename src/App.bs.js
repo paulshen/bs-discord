@@ -3,63 +3,18 @@
 
 var Block = require("bs-platform/lib/js/block.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
-var Js_mapperRt = require("bs-platform/lib/js/js_mapperRt.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
+var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 var WebsocketClient$BsDiscord = require("./WebsocketClient.bs.js");
 
-var jsMapperConstantArray = /* array */[
-  0,
-  1,
-  2,
-  3,
-  4,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11
-];
-
-function opCodeToJs(param) {
-  return Js_mapperRt.toInt(param, jsMapperConstantArray);
-}
-
-function opCodeFromJs(param) {
-  return Js_mapperRt.fromInt(11, jsMapperConstantArray, param);
-}
-
-var jsMapperConstantArray$1 = /* array */[
-  /* tuple */[
-    -102231997,
-    "READY"
-  ],
-  /* tuple */[
-    889912559,
-    "GUILD_CREATE"
-  ],
-  /* tuple */[
-    975859715,
-    "MESSAGE_CREATE"
-  ]
-];
-
-function dispatchMessageTypeToJs(param) {
-  return Js_mapperRt.binarySearch(3, param, jsMapperConstantArray$1);
-}
-
-function dispatchMessageTypeFromJs(param) {
-  return Js_mapperRt.revSearch(3, jsMapperConstantArray$1, param);
-}
-
-var Unsupported = Caml_exceptions.create("Demo-BsDiscord.Unsupported");
+var Unsupported = Caml_exceptions.create("App-BsDiscord.Unsupported");
 
 function parseMessage(messageData) {
-  var match = Belt_Option.getExn(opCodeFromJs(messageData.op));
+  var match = Belt_Option.getExn(PayloadTypes$BsDiscord.opCodeFromJs(messageData.op));
   switch (match) {
     case 0 : 
-        var match$1 = dispatchMessageTypeFromJs(Belt_Option.getExn(messageData.t));
+        var match$1 = PayloadTypes$BsDiscord.dispatchMessageTypeFromJs(Belt_Option.getExn(messageData.t));
         var tmp;
         if (match$1 !== undefined) {
           var dispatchMessageType = match$1;
@@ -93,7 +48,7 @@ var ws = WebsocketClient$BsDiscord.Websocket[/* make */2](undefined, "wss://gate
 WebsocketClient$BsDiscord.Websocket[/* onOpen */4](ws, (function (param) {
         console.log("onOpen");
         return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
-                        op: opCodeToJs(/* Identify */2),
+                        op: PayloadTypes$BsDiscord.opCodeToJs(/* Identify */2),
                         d: {
                           token: "Mzk4OTE3OTQzNTc0MTM0Nzk1.XRKUnA.KNRkoqpdhZVMEvD3ti0abVECf-k",
                           properties: {
@@ -111,7 +66,7 @@ function handleMessage(message) {
   } else {
     setInterval((function (param) {
             return WebsocketClient$BsDiscord.Websocket[/* send */8](ws, JSON.stringify({
-                            op: opCodeToJs(/* Heartbeat */1)
+                            op: PayloadTypes$BsDiscord.opCodeToJs(/* Heartbeat */1)
                           }));
           }), message[0][/* heartbeatInterval */0]);
     return /* () */0;
@@ -136,10 +91,6 @@ WebsocketClient$BsDiscord.Websocket[/* onClose */6](ws, (function (ev) {
         return /* () */0;
       }));
 
-exports.opCodeToJs = opCodeToJs;
-exports.opCodeFromJs = opCodeFromJs;
-exports.dispatchMessageTypeToJs = dispatchMessageTypeToJs;
-exports.dispatchMessageTypeFromJs = dispatchMessageTypeFromJs;
 exports.Unsupported = Unsupported;
 exports.parseMessage = parseMessage;
 exports.ws = ws;
