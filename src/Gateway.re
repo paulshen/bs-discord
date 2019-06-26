@@ -1,14 +1,9 @@
 open WebsocketClient;
 open PayloadTypes;
+open State;
 
 exception Unsupported;
 external hackType: 'a => 'b = "%identity";
-
-type state = {
-  ws: Websocket.t(string),
-  sessionId: ref(option(string)),
-  lastSequenceId: ref(option(int)),
-};
 
 let identify = ({ws}, token) => {
   Websocket.send(
@@ -74,14 +69,16 @@ let startHeartbeat = (ws, lastSequenceId, payload) => {
   |> ignore;
 };
 
-let handleMessage = ({ws, lastSequenceId, sessionId}, message) => {
+let handleMessage = (state, message) => {
+  let {ws, lastSequenceId, sessionId} = state.gateway;
   switch (message) {
   | Hello(payload) => startHeartbeat(ws, lastSequenceId, payload)
   | Dispatch(Ready(readyPayload)) =>
     sessionId := Some(readyPayload.sessionId)
   | Dispatch(GuildCreate(guild)) =>
     switch (guild.presences) {
-    | Some(presences) => PresenceStore.updatePresences(presences)
+    | Some(presences) =>
+      state.presences->PresenceStore.updatePresences(presences)
     | None => ()
     }
   | Dispatch(MessageCreate(message)) =>
@@ -89,40 +86,44 @@ let handleMessage = ({ws, lastSequenceId, sessionId}, message) => {
       ChannelApi.createMessage(message.channelId, "pong") |> ignore;
     }
   | Dispatch(PresenceUpdate(presenceUpdate)) =>
-    PresenceStore.updatePresence(presenceUpdate)
+    state.presences->PresenceStore.updatePresence(presenceUpdate)
   | _ => ()
   };
 };
 
 let createSocket =
     (~token, ~onOpen=?, ~onMessage=?, ~onError=?, ~onClose=?, ()) => {
-  let state = {
+  let gatewayState = {
     ws: Websocket.make("wss://gateway.discord.gg/?v=6&encoding=json"),
     sessionId: ref(None),
     lastSequenceId: ref(None),
   };
+  let state = {
+    gateway: gatewayState,
+    presences: PresenceStore.getInitialState(),
+  };
 
   Websocket.onOpen(
-    state.ws,
+    gatewayState.ws,
     e => {
       switch (onOpen) {
       | Some(onOpen) => onOpen(e)
       | None => ()
       };
-      switch (state.sessionId^) {
-      | Some(_) => resume(state, token)
-      | None => identify(state, token)
+      switch (gatewayState.sessionId^) {
+      | Some(_) => resume(gatewayState, token)
+      | None => identify(gatewayState, token)
       };
     },
   );
 
   Websocket.onMessage(
-    state.ws,
+    gatewayState.ws,
     e => {
       Js.log(MessageEvent.data(e));
       let json = Js.Json.parseExn(MessageEvent.data(e));
       switch (json |> Json.Decode.(field("s", optional(int)))) {
-      | Some(sequenceId) => state.lastSequenceId := Some(sequenceId)
+      | Some(sequenceId) => gatewayState.lastSequenceId := Some(sequenceId)
       | None => ()
       };
 
@@ -137,20 +138,22 @@ let createSocket =
   );
 
   Websocket.onError(
-    state.ws,
+    gatewayState.ws,
     e => {
       switch (onError) {
       | Some(onError) => onError(e)
       | None => ()
       };
-      Websocket.close(state.ws);
+      Websocket.close(gatewayState.ws);
     },
   );
 
-  Websocket.onClose(state.ws, e =>
+  Websocket.onClose(gatewayState.ws, e =>
     switch (onClose) {
     | Some(onClose) => onClose(e)
     | None => ()
     }
   );
+
+  state;
 };

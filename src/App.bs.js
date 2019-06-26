@@ -42,10 +42,11 @@ function onClose(e) {
   return /* () */0;
 }
 
-Gateway$BsDiscord.createSocket(Constants$BsDiscord.token, onOpen, onMessage, onError, onClose, /* () */0);
+var state = Gateway$BsDiscord.createSocket(Constants$BsDiscord.token, onOpen, onMessage, onError, onClose, /* () */0);
 
 exports.onOpen = onOpen;
 exports.onMessage = onMessage;
 exports.onError = onError;
 exports.onClose = onClose;
+exports.state = state;
 /*  Not a pure module */

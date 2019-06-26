@@ -5,7 +5,9 @@ var $$Array = require("bs-platform/lib/js/array.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Belt_MapString = require("bs-platform/lib/js/belt_MapString.js");
 
-var presences = /* record */[/* contents */Belt_MapString.empty];
+function getInitialState(param) {
+  return /* record */[/* contents */Belt_MapString.empty];
+}
 
 function getOptionalUpdate(value, $$default) {
   if (Belt_Option.isSome(value)) {
@@ -15,9 +17,9 @@ function getOptionalUpdate(value, $$default) {
   }
 }
 
-function updatePresence(presenceUpdate) {
+function updatePresence(state, presenceUpdate) {
   var userId = presenceUpdate[/* user */0][/* id */0];
-  var match = Belt_MapString.get(presences[0], userId);
+  var match = Belt_MapString.get(state[0], userId);
   var newPresence;
   if (match !== undefined) {
     var presence = match;
@@ -33,15 +35,17 @@ function updatePresence(presenceUpdate) {
   } else {
     newPresence = presenceUpdate;
   }
-  presences[0] = Belt_MapString.set(presences[0], userId, newPresence);
+  state[0] = Belt_MapString.set(state[0], userId, newPresence);
   return /* () */0;
 }
 
-function updatePresences(presenceUpdates) {
-  return $$Array.iter(updatePresence, presenceUpdates);
+function updatePresences(state, presenceUpdates) {
+  return $$Array.iter((function (presenceUpdate) {
+                return updatePresence(state, presenceUpdate);
+              }), presenceUpdates);
 }
 
-exports.presences = presences;
+exports.getInitialState = getInitialState;
 exports.getOptionalUpdate = getOptionalUpdate;
 exports.updatePresence = updatePresence;
 exports.updatePresences = updatePresences;

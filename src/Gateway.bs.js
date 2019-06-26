@@ -51,27 +51,28 @@ function startHeartbeat(ws, lastSequenceId, payload) {
   return /* () */0;
 }
 
-function handleMessage(param, message) {
+function handleMessage(state, message) {
+  var match = state[/* gateway */0];
   if (typeof message === "number") {
     return /* () */0;
   } else if (message.tag) {
-    var match = message[0];
-    if (typeof match === "number") {
+    var match$1 = message[0];
+    if (typeof match$1 === "number") {
       return /* () */0;
     } else {
-      switch (match.tag | 0) {
+      switch (match$1.tag | 0) {
         case 0 : 
-            param[/* sessionId */1][0] = match[0][/* sessionId */0];
+            match[/* sessionId */1][0] = match$1[0][/* sessionId */0];
             return /* () */0;
         case 1 : 
-            var match$1 = match[0][/* presences */8];
-            if (match$1 !== undefined) {
-              return PresenceStore$BsDiscord.updatePresences(match$1);
+            var match$2 = match$1[0][/* presences */8];
+            if (match$2 !== undefined) {
+              return PresenceStore$BsDiscord.updatePresences(state[/* presences */1], match$2);
             } else {
               return /* () */0;
             }
         case 2 : 
-            var message$1 = match[0];
+            var message$1 = match$1[0];
             if ("ping".indexOf(message$1[/* content */4]) !== -1) {
               ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
               return /* () */0;
@@ -79,45 +80,50 @@ function handleMessage(param, message) {
               return 0;
             }
         case 3 : 
-            return PresenceStore$BsDiscord.updatePresence(match[0]);
+            return PresenceStore$BsDiscord.updatePresence(state[/* presences */1], match$1[0]);
         case 4 : 
             return /* () */0;
         
       }
     }
   } else {
-    return startHeartbeat(param[/* ws */0], param[/* lastSequenceId */2], message[0]);
+    return startHeartbeat(match[/* ws */0], match[/* lastSequenceId */2], message[0]);
   }
 }
 
 function createSocket(token, onOpen, onMessage, onError, onClose, param) {
-  var state_000 = /* ws */WebsocketClient$BsDiscord.Websocket[/* make */2](undefined, "wss://gateway.discord.gg/?v=6&encoding=json");
-  var state_001 = /* sessionId : record */[/* contents */undefined];
-  var state_002 = /* lastSequenceId : record */[/* contents */undefined];
-  var state = /* record */[
-    state_000,
-    state_001,
-    state_002
+  var gatewayState_000 = /* ws */WebsocketClient$BsDiscord.Websocket[/* make */2](undefined, "wss://gateway.discord.gg/?v=6&encoding=json");
+  var gatewayState_001 = /* sessionId : record */[/* contents */undefined];
+  var gatewayState_002 = /* lastSequenceId : record */[/* contents */undefined];
+  var gatewayState = /* record */[
+    gatewayState_000,
+    gatewayState_001,
+    gatewayState_002
   ];
-  WebsocketClient$BsDiscord.Websocket[/* onOpen */4](state_000, (function (e) {
+  var state_001 = /* presences */PresenceStore$BsDiscord.getInitialState(/* () */0);
+  var state = /* record */[
+    /* gateway */gatewayState,
+    state_001
+  ];
+  WebsocketClient$BsDiscord.Websocket[/* onOpen */4](gatewayState_000, (function (e) {
           if (onOpen !== undefined) {
             Curry._1(onOpen, e);
           }
-          var match = state_001[0];
+          var match = gatewayState_001[0];
           if (match !== undefined) {
-            return resume(state, token);
+            return resume(gatewayState, token);
           } else {
-            return identify(state, token);
+            return identify(gatewayState, token);
           }
         }));
-  WebsocketClient$BsDiscord.Websocket[/* onMessage */7](state_000, (function (e) {
+  WebsocketClient$BsDiscord.Websocket[/* onMessage */7](gatewayState_000, (function (e) {
           console.log(e.data);
           var json = JSON.parse(e.data);
           var match = Json_decode.field("s", (function (param) {
                   return Json_decode.optional(Json_decode.$$int, param);
                 }), json);
           if (match !== undefined) {
-            state_002[0] = match;
+            gatewayState_002[0] = match;
           }
           var message = PayloadParser$BsDiscord.parseSocketData(json);
           handleMessage(state, message);
@@ -126,19 +132,20 @@ function createSocket(token, onOpen, onMessage, onError, onClose, param) {
           }
           return /* () */0;
         }));
-  WebsocketClient$BsDiscord.Websocket[/* onError */5](state_000, (function (e) {
+  WebsocketClient$BsDiscord.Websocket[/* onError */5](gatewayState_000, (function (e) {
           if (onError !== undefined) {
             Curry._1(onError, e);
           }
-          return WebsocketClient$BsDiscord.Websocket[/* close */3](undefined, undefined, state_000);
+          return WebsocketClient$BsDiscord.Websocket[/* close */3](undefined, undefined, gatewayState_000);
         }));
-  return WebsocketClient$BsDiscord.Websocket[/* onClose */6](state_000, (function (e) {
-                if (onClose !== undefined) {
-                  return Curry._1(onClose, e);
-                } else {
-                  return /* () */0;
-                }
-              }));
+  WebsocketClient$BsDiscord.Websocket[/* onClose */6](gatewayState_000, (function (e) {
+          if (onClose !== undefined) {
+            return Curry._1(onClose, e);
+          } else {
+            return /* () */0;
+          }
+        }));
+  return state;
 }
 
 exports.Unsupported = Unsupported;

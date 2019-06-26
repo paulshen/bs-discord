@@ -1,7 +1,7 @@
+open State;
 open Types;
 
-let presences: ref(Belt.Map.String.t(presenceUpdate)) =
-  ref(Belt.Map.String.empty);
+let getInitialState = () => ref(Belt.Map.String.empty);
 
 let getOptionalUpdate = (value: option('a), default: option('a)) =>
   if (Belt.Option.isSome(value)) {
@@ -9,11 +9,12 @@ let getOptionalUpdate = (value: option('a), default: option('a)) =>
   } else {
     default;
   };
-let updatePresence = presenceUpdate => {
+
+let updatePresence = (state: State.presenceState, presenceUpdate) => {
   let userId = presenceUpdate.user.id;
   open Belt.Map.String;
   let newPresence =
-    switch ((presences^)->get(userId)) {
+    switch ((state^)->get(userId)) {
     | Some(presence) => {
         user: presenceUpdate.user,
         roles: getOptionalUpdate(presenceUpdate.roles, presence.roles),
@@ -30,9 +31,12 @@ let updatePresence = presenceUpdate => {
       }
     | None => presenceUpdate
     };
-  presences := (presences^)->Belt.Map.String.set(userId, newPresence);
+  state := (state^)->Belt.Map.String.set(userId, newPresence);
 };
 
-let updatePresences = presenceUpdates => {
-  Array.iter(updatePresence, presenceUpdates);
+let updatePresences = (state, presenceUpdates) => {
+  Array.iter(
+    presenceUpdate => state->updatePresence(presenceUpdate),
+    presenceUpdates,
+  );
 };

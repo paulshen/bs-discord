@@ -21,11 +21,12 @@ let onError = e => {
 let onClose = e => {
   Js.log2("onClose", e);
 };
-Gateway.createSocket(
-  ~token=Constants.token,
-  ~onOpen,
-  ~onMessage,
-  ~onError,
-  ~onClose,
-  (),
-);
+let state =
+  Gateway.createSocket(
+    ~token=Constants.token,
+    ~onOpen,
+    ~onMessage,
+    ~onError,
+    ~onClose,
+    (),
+  );
