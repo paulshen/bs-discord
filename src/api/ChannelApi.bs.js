@@ -2,43 +2,16 @@
 'use strict';
 
 var List = require("bs-platform/lib/js/list.js");
-var Fetch = require("bs-fetch/src/Fetch.js");
 var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Api$BsDiscord = require("./Api.bs.js");
-var Constants$BsDiscord = require("../Constants.bs.js");
 var PayloadParser$BsDiscord = require("../PayloadParser.bs.js");
 
 function createMessage(channelId, content) {
   var body = { };
   body["content"] = content;
-  return fetch(Constants$BsDiscord.apiBaseUrl + ("/channels/" + (String(channelId) + "/messages")), Fetch.RequestInit[/* make */0](/* Post */2, {
-                          "Content-Type": "application/json",
-                          Authorization: "Bot " + (String(Constants$BsDiscord.token) + "")
-                        }, Caml_option.some(JSON.stringify(body)), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)(/* () */0)).then((function (response) {
-                    var statusCode = response.status;
-                    var switcher = statusCode - 200 | 0;
-                    if (switcher > 4 || switcher < 0) {
-                      if (switcher !== 104) {
-                        return Promise.reject([
-                                    Api$BsDiscord.ApiError,
-                                    statusCode
-                                  ]);
-                      } else {
-                        return Promise.resolve(response);
-                      }
-                    } else if (switcher === 3 || switcher === 2) {
-                      return Promise.reject([
-                                  Api$BsDiscord.ApiError,
-                                  statusCode
-                                ]);
-                    } else {
-                      return Promise.resolve(response);
-                    }
-                  })).then((function (prim) {
-                  return prim.json();
-                })).then((function (json) {
+  return Api$BsDiscord.requestPost("/channels/" + (String(channelId) + "/messages"), Caml_option.some(body), /* () */0).then((function (json) {
                 var message = PayloadParser$BsDiscord.message(json);
                 console.log("createMessage", message);
                 return Promise.resolve(message);
