@@ -21,6 +21,7 @@ type dispatchMessageType = [
   | [@bs.as "READY"] `Ready
   | [@bs.as "GUILD_CREATE"] `GuildCreate
   | [@bs.as "MESSAGE_CREATE"] `MessageCreate
+  | [@bs.as "MESSAGE_REACTION_ADD"] `MessageReactionAdd
   | [@bs.as "PRESENCE_UPDATE"] `PresenceUpdate
   | [@bs.as "RESUMED"] `Resume
 ];
@@ -34,10 +35,19 @@ type readyPayload = {
 
 type resumedPayload = {trace: array(string)};
 
+type messageReactionAddPayload = {
+  userId: snowflake,
+  channelId: snowflake,
+  messageId: snowflake,
+  guildId: option(snowflake),
+  emoji,
+};
+
 type dispatchMessage =
   | Ready(readyPayload)
   | GuildCreate(guild)
   | MessageCreate(message)
+  | MessageReactionAdd(messageReactionAddPayload)
   | PresenceUpdate(presenceUpdate)
   | Resume(resumedPayload)
   | Unknown;

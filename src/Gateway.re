@@ -81,10 +81,6 @@ let handleMessage = (state, message) => {
       state.presences->PresenceStore.updatePresences(presences)
     | None => ()
     }
-  | Dispatch(MessageCreate(message)) =>
-    if (Js.String.indexOf(message.content, "ping") != (-1)) {
-      ChannelApi.createMessage(message.channelId, "pong") |> ignore;
-    }
   | Dispatch(PresenceUpdate(presenceUpdate)) =>
     state.presences->PresenceStore.updatePresence(presenceUpdate)
   | _ => ()

@@ -35,6 +35,10 @@ var jsMapperConstantArray$1 = /* array */[
     "PRESENCE_UPDATE"
   ],
   /* tuple */[
+    348131217,
+    "MESSAGE_REACTION_ADD"
+  ],
+  /* tuple */[
     889912559,
     "GUILD_CREATE"
   ],
@@ -49,11 +53,11 @@ var jsMapperConstantArray$1 = /* array */[
 ];
 
 function dispatchMessageTypeToJs(param) {
-  return Js_mapperRt.binarySearch(5, param, jsMapperConstantArray$1);
+  return Js_mapperRt.binarySearch(6, param, jsMapperConstantArray$1);
 }
 
 function dispatchMessageTypeFromJs(param) {
-  return Js_mapperRt.revSearch(5, jsMapperConstantArray$1, param);
+  return Js_mapperRt.revSearch(6, jsMapperConstantArray$1, param);
 }
 
 exports.opCodeToJs = opCodeToJs;

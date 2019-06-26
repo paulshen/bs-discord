@@ -359,6 +359,18 @@ function resumePayload(json) {
                 }), json)];
 }
 
+function messageReactionAddPayload(json) {
+  return /* record */[
+          /* userId */Json_decode.field("user_id", Json_decode.string, json),
+          /* channelId */Json_decode.field("channel_id", Json_decode.string, json),
+          /* messageId */Json_decode.field("message_id", Json_decode.string, json),
+          /* guildId */Json_decode.optional((function (param) {
+                  return Json_decode.field("guild_id", Json_decode.string, param);
+                }), json),
+          /* emoji */Json_decode.field("emoji", emoji, json)
+        ];
+}
+
 function parseSocketData(json) {
   var match = Belt_Option.getExn(PayloadTypes$BsDiscord.opCodeFromJs(Json_decode.field("op", Json_decode.$$int, json)));
   switch (match) {
@@ -367,13 +379,15 @@ function parseSocketData(json) {
         var tmp;
         if (match$1 !== undefined) {
           var match$2 = match$1;
-          tmp = match$2 !== -41763132 ? (
+          tmp = match$2 >= 348131217 ? (
               match$2 >= 975859715 ? (
-                  match$2 >= 1025039821 ? /* Resume */Block.__(4, [Json_decode.field("d", resumePayload, json)]) : /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)])
+                  match$2 >= 1025039821 ? /* Resume */Block.__(5, [Json_decode.field("d", resumePayload, json)]) : /* MessageCreate */Block.__(2, [Json_decode.field("d", message, json)])
                 ) : (
-                  match$2 >= 889912559 ? /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
+                  match$2 >= 889912559 ? /* GuildCreate */Block.__(1, [Json_decode.field("d", guild, json)]) : /* MessageReactionAdd */Block.__(3, [Json_decode.field("d", messageReactionAddPayload, json)])
                 )
-            ) : /* PresenceUpdate */Block.__(3, [Json_decode.field("d", presenceUpdate, json)]);
+            ) : (
+              match$2 >= -41763132 ? /* PresenceUpdate */Block.__(4, [Json_decode.field("d", presenceUpdate, json)]) : /* Ready */Block.__(0, [Json_decode.field("d", readyPayload, json)])
+            );
         } else {
           tmp = /* Unknown */0;
         }
@@ -412,5 +426,6 @@ exports.message = message;
 exports.readyPayload = readyPayload;
 exports.helloPayload = helloPayload;
 exports.resumePayload = resumePayload;
+exports.messageReactionAddPayload = messageReactionAddPayload;
 exports.parseSocketData = parseSocketData;
 /* No side effect */

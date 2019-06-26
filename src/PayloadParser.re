@@ -194,6 +194,16 @@ let resumePayload = (json): resumedPayload => {
   Json.Decode.{trace: field("_trace", array(string), json)};
 };
 
+let messageReactionAddPayload = (json): messageReactionAddPayload => {
+  Json.Decode.{
+    userId: json |> field("user_id", string),
+    channelId: json |> field("channel_id", string),
+    messageId: json |> field("message_id", string),
+    guildId: json |> optional(field("guild_id", string)),
+    emoji: json |> field("emoji", emoji),
+  };
+};
+
 let parseSocketData = json => {
   Json.Decode.(
     switch (Belt.Option.getExn(opCodeFromJs(field("op", int, json)))) {
@@ -204,6 +214,8 @@ let parseSocketData = json => {
         | Some(`Ready) => Ready(field("d", readyPayload, json))
         | Some(`GuildCreate) => GuildCreate(field("d", guild, json))
         | Some(`MessageCreate) => MessageCreate(field("d", message, json))
+        | Some(`MessageReactionAdd) =>
+          MessageReactionAdd(field("d", messageReactionAddPayload, json))
         | Some(`PresenceUpdate) =>
           PresenceUpdate(field("d", presenceUpdate, json))
         | Some(`Resume) => Resume(field("d", resumePayload, json))

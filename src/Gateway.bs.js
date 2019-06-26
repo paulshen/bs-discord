@@ -5,7 +5,6 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
-var ChannelApi$BsDiscord = require("./api/ChannelApi.bs.js");
 var PayloadTypes$BsDiscord = require("./PayloadTypes.bs.js");
 var PayloadParser$BsDiscord = require("./PayloadParser.bs.js");
 var PresenceStore$BsDiscord = require("./state/PresenceStore.bs.js");
@@ -71,19 +70,10 @@ function handleMessage(state, message) {
             } else {
               return /* () */0;
             }
-        case 2 : 
-            var message$1 = match$1[0];
-            if ("ping".indexOf(message$1[/* content */5]) !== -1) {
-              ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
-              return /* () */0;
-            } else {
-              return 0;
-            }
-        case 3 : 
-            return PresenceStore$BsDiscord.updatePresence(state[/* presences */1], match$1[0]);
         case 4 : 
-            return /* () */0;
-        
+            return PresenceStore$BsDiscord.updatePresence(state[/* presences */1], match$1[0]);
+        default:
+          return /* () */0;
       }
     }
   } else {
