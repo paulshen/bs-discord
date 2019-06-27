@@ -173,6 +173,84 @@ let messageReaction = (json): messageReaction => {
   };
 };
 
+module Embed = {
+  let footer = (json): Embed.footer => {
+    Json.Decode.{
+      text: json |> field("text", string),
+      iconUrl: json |> optional(field("icon_url", string)),
+      proxyIconUrl: json |> optional(field("proxy_icon_url", string)),
+    };
+  };
+
+  let image = (json): Embed.image => {
+    Json.Decode.{
+      url: json |> optional(field("url", string)),
+      proxyUrl: json |> optional(field("proxy_url", string)),
+      height: json |> optional(field("height", int)),
+      width: json |> optional(field("width", int)),
+    };
+  };
+
+  let thumbnail = (json): Embed.thumbnail => {
+    Json.Decode.{
+      url: json |> optional(field("url", string)),
+      proxyUrl: json |> optional(field("proxy_url", string)),
+      height: json |> optional(field("height", int)),
+      width: json |> optional(field("width", int)),
+    };
+  };
+
+  let video = (json): Embed.video => {
+    Json.Decode.{
+      url: json |> optional(field("url", string)),
+      height: json |> optional(field("height", int)),
+      width: json |> optional(field("width", int)),
+    };
+  };
+
+  let provider = (json): Embed.provider => {
+    Json.Decode.{
+      name: json |> optional(field("name", string)),
+      url: json |> optional(field("url", string)),
+    };
+  };
+
+  let author = (json): Embed.author => {
+    Json.Decode.{
+      name: json |> optional(field("name", string)),
+      url: json |> optional(field("url", string)),
+      iconUrl: json |> optional(field("icon_url", string)),
+      proxyIconUrl: json |> optional(field("proxy_icon_url", string)),
+    };
+  };
+
+  let field = (json): Embed.field => {
+    Json.Decode.{
+      name: json |> field("name", string),
+      value: json |> field("value", string),
+      inline: json |> optional(field("inline", bool)),
+    };
+  };
+};
+
+let embed = (json): Types.Embed.t => {
+  Json.Decode.{
+    title: json |> optional(field("title", string)),
+    type_: json |> optional(field("type", string)),
+    description: json |> optional(field("description", string)),
+    url: json |> optional(field("url", string)),
+    timestamp: json |> optional(field("timestamp", date)),
+    color: json |> optional(field("color", int)),
+    footer: json |> optional(field("footer", Embed.footer)),
+    image: json |> optional(field("image", Embed.image)),
+    thumbnail: json |> optional(field("thumbnail", Embed.thumbnail)),
+    video: json |> optional(field("video", Embed.video)),
+    provider: json |> optional(field("provider", Embed.provider)),
+    author: json |> optional(field("author", Embed.author)),
+    fields: json |> optional(field("fields", array(Embed.field))),
+  };
+};
+
 let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
@@ -186,6 +264,7 @@ let message = (json): message => {
     tts: json |> field("tts", bool),
     mentionEveryone: json |> field("mention_everyone", bool),
     mentionRoles: json |> field("mention_roles", array(string)),
+    embeds: json |> field("embeds", array(embed)),
     reactions: json |> optional(field("reactions", array(messageReaction))),
     nonce: json |> optional(field("nonce", optional(string))),
     pinned: json |> field("pinned", bool),

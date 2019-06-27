@@ -166,6 +166,70 @@ type messageReaction = {
   emoji,
 };
 
+module Embed = {
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+  type footer = {
+    text: string,
+    iconUrl: option(string),
+    proxyIconUrl: option(string),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-field-structure
+  type field = {
+    name: string,
+    value: string,
+    inline: option(bool),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-image-structure
+  type image = {
+    url: option(string),
+    proxyUrl: option(string),
+    height: option(int),
+    width: option(int),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
+  type thumbnail = {
+    url: option(string),
+    proxyUrl: option(string),
+    height: option(int),
+    width: option(int),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-video-structure
+  type video = {
+    url: option(string),
+    height: option(int),
+    width: option(int),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+  type provider = {
+    name: option(string),
+    url: option(string),
+  };
+  // https://discordapp.com/developers/docs/resources/channel#embed-object-embed-author-structure
+  type author = {
+    name: option(string),
+    url: option(string),
+    iconUrl: option(string),
+    proxyIconUrl: option(string),
+  };
+
+  // https://discordapp.com/developers/docs/resources/channel#embed-object
+  type t = {
+    title: option(string),
+    type_: option(string),
+    description: option(string),
+    url: option(string),
+    timestamp: option(Js.Date.t),
+    color: option(int),
+    footer: option(footer),
+    image: option(image),
+    thumbnail: option(thumbnail),
+    video: option(video),
+    provider: option(provider),
+    author: option(author),
+    fields: option(array(field)),
+  };
+};
+
 [@bs.deriving jsConverter]
 type messageType =
   | [@bs.as 0] Default
@@ -180,6 +244,7 @@ type messageType =
   | [@bs.as 9] UserPremiumGuildSubscriptionTier1
   | [@bs.as 10] UserPremiumGuildSubscriptionTier2
   | [@bs.as 11] UserPremiumGuildSubscriptionTier3;
+// https://discordapp.com/developers/docs/resources/channel#message-object-message-structure
 type message = {
   id: snowflake,
   channelId: snowflake,
@@ -192,6 +257,7 @@ type message = {
   tts: bool,
   mentionEveryone: bool,
   mentionRoles: array(snowflake),
+  embeds: array(Embed.t),
   reactions: option(array(messageReaction)),
   nonce: option(option(snowflake)),
   pinned: bool,
