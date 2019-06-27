@@ -263,6 +263,27 @@ let messageAttachment = (json): messageAttachment => {
   };
 };
 
+let messageActivity = (json): messageActivity => {
+  Json.Decode.{
+    type_:
+      json
+      |> field("type", int)
+      |> messageActivityTypeFromJs
+      |> Belt.Option.getExn,
+    partyId: json |> optional(field("party_id", string)),
+  };
+};
+
+let messageApplication = (json): messageApplication => {
+  Json.Decode.{
+    id: json |> field("id", string),
+    coverImage: json |> optional(field("cover_image", string)),
+    description: json |> field("description", string),
+    icon: json |> optional(field("icon", string)),
+    name: json |> field("name", string),
+  };
+};
+
 let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
@@ -284,6 +305,8 @@ let message = (json): message => {
     webhookId: json |> optional(field("webhookId", string)),
     type_:
       json |> field("type", int) |> messageTypeFromJs |> Belt.Option.getExn,
+    activity: json |> field("activity", optional(messageActivity)),
+    application: json |> field("application", optional(messageApplication)),
   };
 };
 

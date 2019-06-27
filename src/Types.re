@@ -240,6 +240,28 @@ type messageAttachment = {
   width: option(int),
 };
 
+// https://discordapp.com/developers/docs/resources/channel#message-object-message-activity-types
+[@bs.deriving jsConverter]
+type messageActivityType =
+  | [@bs.as 1] Join
+  | [@bs.as 2] Spectate
+  | [@bs.as 3] Listen
+  | [@bs.as 4] JoinRequest;
+// https://discordapp.com/developers/docs/resources/channel#message-object-message-activity-structure
+type messageActivity = {
+  type_: messageActivityType,
+  partyId: option(string),
+};
+
+// https://discordapp.com/developers/docs/resources/channel#message-object-message-application-structure
+type messageApplication = {
+  id: snowflake,
+  coverImage: option(string),
+  description: string,
+  icon: option(string),
+  name: string,
+};
+
 [@bs.deriving jsConverter]
 type messageType =
   | [@bs.as 0] Default
@@ -274,5 +296,7 @@ type message = {
   pinned: bool,
   webhookId: option(snowflake),
   type_: messageType,
-  /* todo: mentions, attachments, embeds, activity, application */
+  activity: option(messageActivity),
+  application: option(messageApplication),
+  /* todo: mentions */
 };
