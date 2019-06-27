@@ -305,8 +305,8 @@ let message = (json): message => {
     webhookId: json |> optional(field("webhookId", string)),
     type_:
       json |> field("type", int) |> messageTypeFromJs |> Belt.Option.getExn,
-    activity: json |> field("activity", optional(messageActivity)),
-    application: json |> field("application", optional(messageApplication)),
+    activity: json |> optional(field("activity", messageActivity)),
+    application: json |> optional(field("application", messageApplication)),
   };
 };
 

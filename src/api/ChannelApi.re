@@ -53,7 +53,7 @@ let updateChannel =
       ),
     );
   Js.Promise.(
-    Api.requestPost({j|/channels/$channelId|j}, ~bodyJson, ())
+    Api.requestPatch({j|/channels/$channelId|j}, ~bodyJson, ())
     |> then_(json => {
          let channel = PayloadParser.channel(json);
          Js.log2("patchMessage", channel);
