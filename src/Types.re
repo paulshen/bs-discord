@@ -230,6 +230,16 @@ module Embed = {
   };
 };
 
+type messageAttachment = {
+  id: snowflake,
+  filename: string,
+  size: int,
+  url: string,
+  proxyUrl: string,
+  height: option(int),
+  width: option(int),
+};
+
 [@bs.deriving jsConverter]
 type messageType =
   | [@bs.as 0] Default
@@ -258,6 +268,7 @@ type message = {
   mentionEveryone: bool,
   mentionRoles: array(snowflake),
   embeds: array(Embed.t),
+  attachments: array(messageAttachment),
   reactions: option(array(messageReaction)),
   nonce: option(option(snowflake)),
   pinned: bool,

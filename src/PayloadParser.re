@@ -251,6 +251,18 @@ let embed = (json): Types.Embed.t => {
   };
 };
 
+let messageAttachment = (json): messageAttachment => {
+  Json.Decode.{
+    id: json |> field("id", string),
+    filename: json |> field("filename", string),
+    size: json |> field("size", int),
+    url: json |> field("url", string),
+    proxyUrl: json |> field("proxy_url", string),
+    height: json |> field("height", optional(int)),
+    width: json |> field("width", optional(int)),
+  };
+};
+
 let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
@@ -265,6 +277,7 @@ let message = (json): message => {
     mentionEveryone: json |> field("mention_everyone", bool),
     mentionRoles: json |> field("mention_roles", array(string)),
     embeds: json |> field("embeds", array(embed)),
+    attachments: json |> field("attachments", array(messageAttachment)),
     reactions: json |> optional(field("reactions", array(messageReaction))),
     nonce: json |> optional(field("nonce", optional(string))),
     pinned: json |> field("pinned", bool),
