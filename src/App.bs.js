@@ -2,6 +2,7 @@
 'use strict';
 
 var Gateway$BsDiscord = require("./Gateway.bs.js");
+var EmojiApi$BsDiscord = require("./api/EmojiApi.bs.js");
 var Constants$BsDiscord = require("./Constants.bs.js");
 var ChannelApi$BsDiscord = require("./api/ChannelApi.bs.js");
 
@@ -46,6 +47,11 @@ function onMessage(message) {
                               console.log("react", param);
                               return /* () */0;
                             }));
+              }));
+      }
+      if ("getGuildEmojis".indexOf(message$1[/* content */5]) !== -1) {
+        EmojiApi$BsDiscord.getGuildEmojis("467125609773006859").then((function (emojis) {
+                return Promise.resolve((console.log("getGuildEmojis", emojis), /* () */0));
               }));
         return /* () */0;
       } else {

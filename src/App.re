@@ -45,6 +45,13 @@ let onMessage = message => {
       )
       |> ignore;
     };
+    if (Js.String.indexOf(message.content, "getGuildEmojis") != (-1)) {
+      Js.Promise.(
+        EmojiApi.getGuildEmojis("467125609773006859")
+        |> then_(emojis => Js.log2("getGuildEmojis", emojis) |> resolve)
+      )
+      |> ignore;
+    };
   | _ => ()
   };
 };
