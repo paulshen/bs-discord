@@ -59,9 +59,16 @@ let updateChannel =
          Js.log2("patchMessage", channel);
          resolve(channel);
        })
-    |> catch(err => {
-         Js.log2("error", err);
-         reject(Not_found);
+  );
+};
+
+let deleteChannel = (channelId: snowflake) => {
+  Js.Promise.(
+    Api.requestDelete({j|/channels/$channelId|j})
+    |> then_(json => {
+         let channel = PayloadParser.channel(json);
+         Js.log2("deleteMessage", channel);
+         resolve(channel);
        })
   );
 };
@@ -119,5 +126,12 @@ let getMessages =
     |> then_(json =>
          json |> Json.Decode.array(PayloadParser.message) |> resolve
        )
+  );
+};
+
+let getMessage = (channelId: snowflake, messageId: snowflake) => {
+  Js.Promise.(
+    Api.requestGet({j|/channels/$channelId/messages/$messageId|j}, ())
+    |> then_(json => json |> PayloadParser.message |> resolve)
   );
 };

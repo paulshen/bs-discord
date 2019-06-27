@@ -6,7 +6,6 @@ var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Api$BsDiscord = require("./Api.bs.js");
-var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 var PayloadParser$BsDiscord = require("../PayloadParser.bs.js");
 
 function getChannel(channelId) {
@@ -43,12 +42,17 @@ function updateChannel(channelId, name, position, topic, nsfw, rateLimitPerUser,
   }
   var bodyJson = tmp;
   return Api$BsDiscord.requestPost("/channels/" + (String(channelId) + ""), Caml_option.some(bodyJson), /* () */0).then((function (json) {
-                  var channel = PayloadParser$BsDiscord.channel(json);
-                  console.log("patchMessage", channel);
-                  return Promise.resolve(channel);
-                })).catch((function (err) {
-                console.log("error", err);
-                return Promise.reject(Caml_builtin_exceptions.not_found);
+                var channel = PayloadParser$BsDiscord.channel(json);
+                console.log("patchMessage", channel);
+                return Promise.resolve(channel);
+              }));
+}
+
+function deleteChannel(channelId) {
+  return Api$BsDiscord.requestDelete("/channels/" + (String(channelId) + "")).then((function (json) {
+                var channel = PayloadParser$BsDiscord.channel(json);
+                console.log("deleteMessage", channel);
+                return Promise.resolve(channel);
               }));
 }
 
@@ -111,9 +115,17 @@ function getMessages(channelId, around, before, after, limit, param) {
               }));
 }
 
+function getMessage(channelId, messageId) {
+  return Api$BsDiscord.requestGet("/channels/" + (String(channelId) + ("/messages/" + (String(messageId) + ""))), undefined, /* () */0).then((function (json) {
+                return Promise.resolve(PayloadParser$BsDiscord.message(json));
+              }));
+}
+
 exports.getChannel = getChannel;
 exports.updateChannel = updateChannel;
+exports.deleteChannel = deleteChannel;
 exports.createMessage = createMessage;
 exports.createParams = createParams;
 exports.getMessages = getMessages;
+exports.getMessage = getMessage;
 /* No side effect */

@@ -26,7 +26,19 @@ function onMessage(message) {
         ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
       }
       if ("patch".indexOf(message$1[/* content */5]) !== -1) {
-        console.log("patch", ChannelApi$BsDiscord.updateChannel(message$1[/* channelId */1], "Hello", undefined, undefined, undefined, undefined, undefined, undefined, undefined, /* () */0));
+        ChannelApi$BsDiscord.updateChannel(message$1[/* channelId */1], "Hello", undefined, undefined, undefined, undefined, undefined, undefined, undefined, /* () */0).then((function (channel) {
+                return Promise.resolve((console.log("patch", channel), /* () */0));
+              }));
+      }
+      if ("delete".indexOf(message$1[/* content */5]) !== -1) {
+        ChannelApi$BsDiscord.deleteChannel(message$1[/* channelId */1]).then((function (channel) {
+                return Promise.resolve((console.log("delete", channel), /* () */0));
+              }));
+      }
+      if ("get".indexOf(message$1[/* content */5]) !== -1) {
+        ChannelApi$BsDiscord.getMessage(message$1[/* channelId */1], message$1[/* id */0]).then((function (message) {
+                return Promise.resolve((console.log("get", message), /* () */0));
+              }));
         return /* () */0;
       } else {
         return 0;

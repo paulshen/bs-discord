@@ -13,10 +13,25 @@ let onMessage = message => {
       ChannelApi.createMessage(message.channelId, "pong") |> ignore;
     };
     if (Js.String.indexOf(message.content, "patch") != (-1)) {
-      Js.log2(
-        "patch",
-        ChannelApi.updateChannel(message.channelId, ~name="Hello", ()),
-      );
+      Js.Promise.(
+        ChannelApi.updateChannel(message.channelId, ~name="Hello", ())
+        |> then_(channel => Js.log2("patch", channel) |> resolve)
+      )
+      |> ignore;
+    };
+    if (Js.String.indexOf(message.content, "delete") != (-1)) {
+      Js.Promise.(
+        ChannelApi.deleteChannel(message.channelId)
+        |> then_(channel => Js.log2("delete", channel) |> resolve)
+      )
+      |> ignore;
+    };
+    if (Js.String.indexOf(message.content, "get") != (-1)) {
+      Js.Promise.(
+        ChannelApi.getMessage(message.channelId, message.id)
+        |> then_(message => Js.log2("get", message) |> resolve)
+      )
+      |> ignore;
     };
   | _ => ()
   };
