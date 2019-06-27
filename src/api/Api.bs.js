@@ -82,6 +82,37 @@ function requestPost(url, bodyJson, param) {
               }));
 }
 
+function requestPatch(url, bodyJson, param) {
+  return fetch(Constants$BsDiscord.apiBaseUrl + url, Fetch.RequestInit[/* make */0](/* Patch */8, {
+                        "Content-Type": "application/json",
+                        Authorization: "Bot " + (String(Constants$BsDiscord.token) + "")
+                      }, Belt_Option.map(bodyJson, (function (bodyJson) {
+                              return JSON.stringify(bodyJson);
+                            })), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)(/* () */0)).then((function (response) {
+                  var statusCode = response.status;
+                  var switcher = statusCode - 200 | 0;
+                  if (switcher > 4 || switcher < 0) {
+                    if (switcher !== 104) {
+                      return Promise.reject([
+                                  ApiError,
+                                  statusCode
+                                ]);
+                    } else {
+                      return Promise.resolve(response);
+                    }
+                  } else if (switcher === 3 || switcher === 2) {
+                    return Promise.reject([
+                                ApiError,
+                                statusCode
+                              ]);
+                  } else {
+                    return Promise.resolve(response);
+                  }
+                })).then((function (prim) {
+                return prim.json();
+              }));
+}
+
 function requestPut(url, bodyJson, param) {
   return fetch(Constants$BsDiscord.apiBaseUrl + url, Fetch.RequestInit[/* make */0](/* Put */3, {
                         "Content-Type": "application/json",
@@ -146,6 +177,7 @@ exports.urlWithQueryParams = urlWithQueryParams;
 exports.ApiError = ApiError;
 exports.requestGet = requestGet;
 exports.requestPost = requestPost;
+exports.requestPatch = requestPatch;
 exports.requestPut = requestPut;
 exports.requestDelete = requestDelete;
 /* No side effect */

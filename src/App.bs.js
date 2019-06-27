@@ -2,6 +2,7 @@
 'use strict';
 
 var Gateway$BsDiscord = require("./Gateway.bs.js");
+var UserApi$BsDiscord = require("./api/UserApi.bs.js");
 var EmojiApi$BsDiscord = require("./api/EmojiApi.bs.js");
 var Constants$BsDiscord = require("./Constants.bs.js");
 var ChannelApi$BsDiscord = require("./api/ChannelApi.bs.js");
@@ -26,8 +27,8 @@ function onMessage(message) {
       if ("ping".indexOf(message$1[/* content */5]) !== -1) {
         ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
       }
-      if ("patch".indexOf(message$1[/* content */5]) !== -1) {
-        ChannelApi$BsDiscord.updateChannel(message$1[/* channelId */1], "Hello", undefined, undefined, undefined, undefined, undefined, undefined, undefined, /* () */0).then((function (channel) {
+      if ("patchChannel".indexOf(message$1[/* content */5]) !== -1) {
+        ChannelApi$BsDiscord.updateChannel(message$1[/* channelId */1], "hello", undefined, undefined, undefined, undefined, undefined, undefined, undefined, /* () */0).then((function (channel) {
                 return Promise.resolve((console.log("patch", channel), /* () */0));
               }));
       }
@@ -52,6 +53,16 @@ function onMessage(message) {
       if ("getGuildEmojis".indexOf(message$1[/* content */5]) !== -1) {
         EmojiApi$BsDiscord.getGuildEmojis("467125609773006859").then((function (emojis) {
                 return Promise.resolve((console.log("getGuildEmojis", emojis), /* () */0));
+              }));
+      }
+      if ("me".indexOf(message$1[/* content */5]) !== -1) {
+        UserApi$BsDiscord.getCurrentUser(/* () */0).then((function (user) {
+                return Promise.resolve((console.log("getCurrentUser", user), /* () */0));
+              }));
+      }
+      if ("patchMe".indexOf(message$1[/* content */5]) !== -1) {
+        UserApi$BsDiscord.updateCurrentUser("rename-bot", /* () */0).then((function (user) {
+                return Promise.resolve((console.log("patchMe", user), /* () */0));
               }));
         return /* () */0;
       } else {

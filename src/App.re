@@ -12,9 +12,9 @@ let onMessage = message => {
     if (Js.String.indexOf(message.content, "ping") != (-1)) {
       ChannelApi.createMessage(message.channelId, "pong") |> ignore;
     };
-    if (Js.String.indexOf(message.content, "patch") != (-1)) {
+    if (Js.String.indexOf(message.content, "patchChannel") != (-1)) {
       Js.Promise.(
-        ChannelApi.updateChannel(message.channelId, ~name="Hello", ())
+        ChannelApi.updateChannel(message.channelId, ~name="hello", ())
         |> then_(channel => Js.log2("patch", channel) |> resolve)
       )
       |> ignore;
@@ -49,6 +49,20 @@ let onMessage = message => {
       Js.Promise.(
         EmojiApi.getGuildEmojis("467125609773006859")
         |> then_(emojis => Js.log2("getGuildEmojis", emojis) |> resolve)
+      )
+      |> ignore;
+    };
+    if (Js.String.indexOf(message.content, "me") != (-1)) {
+      Js.Promise.(
+        UserApi.getCurrentUser()
+        |> then_(user => Js.log2("getCurrentUser", user) |> resolve)
+      )
+      |> ignore;
+    };
+    if (Js.String.indexOf(message.content, "patchMe") != (-1)) {
+      Js.Promise.(
+        UserApi.updateCurrentUser(~username="rename-bot", ())
+        |> then_(user => Js.log2("patchMe", user) |> resolve)
       )
       |> ignore;
     };
