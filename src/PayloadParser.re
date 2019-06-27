@@ -284,6 +284,22 @@ let messageApplication = (json): messageApplication => {
   };
 };
 
+let messageMentionMember = (json): messageMentionMember => {
+  Json.Decode.{
+    roles: json |> field("roles", array(string)),
+    joinedAt: json |> field("joined_at", date),
+    mute: json |> field("mute", bool),
+    deaf: json |> field("deaf", bool),
+  };
+};
+
+let messageMention = (json): messageMention => {
+  Json.Decode.{
+    user: json |> field("user", user),
+    member: json |> field("member", messageMentionMember),
+  };
+};
+
 let message = (json): message => {
   Json.Decode.{
     id: json |> field("id", string),
@@ -295,6 +311,7 @@ let message = (json): message => {
     timestamp: json |> field("timestamp", date),
     editedTimestamp: json |> field("edited_timestamp", optional(date)),
     tts: json |> field("tts", bool),
+    mentions: json |> field("mentions", array(messageMention)),
     mentionEveryone: json |> field("mention_everyone", bool),
     mentionRoles: json |> field("mention_roles", array(string)),
     embeds: json |> field("embeds", array(embed)),

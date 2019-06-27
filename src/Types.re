@@ -262,6 +262,18 @@ type messageApplication = {
   name: string,
 };
 
+type messageMentionMember = {
+  roles: array(snowflake),
+  joinedAt: Js.Date.t,
+  mute: bool,
+  deaf: bool,
+};
+
+type messageMention = {
+  user,
+  member: messageMentionMember,
+};
+
 [@bs.deriving jsConverter]
 type messageType =
   | [@bs.as 0] Default
@@ -287,6 +299,7 @@ type message = {
   timestamp: Js.Date.t,
   editedTimestamp: option(Js.Date.t),
   tts: bool,
+  mentions: array(messageMention),
   mentionEveryone: bool,
   mentionRoles: array(snowflake),
   embeds: array(Embed.t),
@@ -298,5 +311,4 @@ type message = {
   type_: messageType,
   activity: option(messageActivity),
   application: option(messageApplication),
-  /* todo: mentions */
 };
