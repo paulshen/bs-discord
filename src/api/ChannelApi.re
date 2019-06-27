@@ -73,14 +73,25 @@ let deleteChannel = (channelId: snowflake) => {
   );
 };
 
-let createMessage = (channelId: snowflake, content: string) => {
-  let body = Js.Dict.empty();
-  Js.Dict.set(body, "content", Js.Json.string(content));
-  Api.requestPost(
-    {j|/channels/$channelId/messages|j},
-    ~bodyJson=Json.Encode.dict(body),
-    (),
-  )
+[@bs.deriving abstract]
+type createMessageParams = {
+  [@bs.optional]
+  content: string,
+  [@bs.optional]
+  nonce: snowflake,
+  [@bs.optional]
+  tts: bool,
+  /* todo: file, embed */
+  [@bs.optional] [@bs.as "payload_json"]
+  payloadJson: string,
+};
+let createMessage =
+    (channelId: snowflake, ~content=?, ~nonce=?, ~tts=?, ~payloadJson=?, ()) => {
+  let bodyJson =
+    hackType(
+      createMessageParams(~content?, ~nonce?, ~tts?, ~payloadJson?, ()),
+    );
+  Api.requestPost({j|/channels/$channelId/messages|j}, ~bodyJson, ())
   |> Js.Promise.(
        then_(json => {
          let message = PayloadParser.message(json);

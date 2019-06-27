@@ -10,7 +10,8 @@ let onMessage = message => {
   switch (message) {
   | Dispatch(MessageCreate(message)) =>
     if (Js.String.indexOf(message.content, "ping") != (-1)) {
-      ChannelApi.createMessage(message.channelId, "pong") |> ignore;
+      ChannelApi.createMessage(message.channelId, ~content="pong", ())
+      |> ignore;
     };
     if (Js.String.indexOf(message.content, "patchChannel") != (-1)) {
       Js.Promise.(
