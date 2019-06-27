@@ -135,3 +135,20 @@ let getMessage = (channelId: snowflake, messageId: snowflake) => {
     |> then_(json => json |> PayloadParser.message |> resolve)
   );
 };
+
+let addReaction =
+    (
+      channelId: snowflake,
+      messageId: snowflake,
+      ~emojiName: string,
+      ~emojiId: snowflake,
+    ) => {
+  let emoji = {j|$emojiName:$emojiId|j};
+  Js.Promise.(
+    Api.requestPut(
+      {j|/channels/$channelId/messages/$messageId/reactions/$emoji/@me|j},
+      (),
+    )
+    |> then_(_json => resolve())
+  );
+};

@@ -33,6 +33,18 @@ let onMessage = message => {
       )
       |> ignore;
     };
+    if (Js.String.indexOf(message.content, "react") != (-1)) {
+      Js.Promise.(
+        ChannelApi.addReaction(
+          message.channelId,
+          message.id,
+          ~emojiName="tester",
+          ~emojiId="593616291546267658",
+        )
+        |> then_(() => Js.log2("react") |> resolve)
+      )
+      |> ignore;
+    };
   | _ => ()
   };
 };

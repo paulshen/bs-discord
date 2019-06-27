@@ -121,6 +121,13 @@ function getMessage(channelId, messageId) {
               }));
 }
 
+function addReaction(channelId, messageId, emojiName, emojiId) {
+  var emoji = "" + (String(emojiName) + (":" + (String(emojiId) + "")));
+  return Api$BsDiscord.requestPut("/channels/" + (String(channelId) + ("/messages/" + (String(messageId) + ("/reactions/" + (String(emoji) + "/@me"))))), undefined, /* () */0).then((function (_json) {
+                return Promise.resolve(/* () */0);
+              }));
+}
+
 exports.getChannel = getChannel;
 exports.updateChannel = updateChannel;
 exports.deleteChannel = deleteChannel;
@@ -128,4 +135,5 @@ exports.createMessage = createMessage;
 exports.createParams = createParams;
 exports.getMessages = getMessages;
 exports.getMessage = getMessage;
+exports.addReaction = addReaction;
 /* No side effect */

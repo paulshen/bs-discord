@@ -39,6 +39,14 @@ function onMessage(message) {
         ChannelApi$BsDiscord.getMessage(message$1[/* channelId */1], message$1[/* id */0]).then((function (message) {
                 return Promise.resolve((console.log("get", message), /* () */0));
               }));
+      }
+      if ("react".indexOf(message$1[/* content */5]) !== -1) {
+        ChannelApi$BsDiscord.addReaction(message$1[/* channelId */1], message$1[/* id */0], "tester", "593616291546267658").then((function (param) {
+                return Promise.resolve((function (param) {
+                              console.log("react", param);
+                              return /* () */0;
+                            }));
+              }));
         return /* () */0;
       } else {
         return 0;
