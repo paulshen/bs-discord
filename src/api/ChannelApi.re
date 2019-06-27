@@ -90,18 +90,6 @@ let createMessage = (channelId: snowflake, content: string) => {
      );
 };
 
-let createParams = (params: list((string, option(string)))) => {
-  let filteredParams = [||];
-  List.iter(
-    ((key, value)) =>
-      switch (value) {
-      | Some(value) => Js.Array.push((key, value), filteredParams) |> ignore
-      | None => ()
-      },
-    params,
-  );
-  filteredParams;
-};
 let getMessages =
     (
       channelId: snowflake,
@@ -115,7 +103,7 @@ let getMessages =
     Api.requestGet(
       {j|/channels/$channelId/messages|j},
       ~queryParams=
-        createParams([
+        Api.createParams([
           ("around", around),
           ("before", before),
           ("after", after),

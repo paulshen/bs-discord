@@ -28,3 +28,27 @@ let updateCurrentUser = (~username=?, ()) => {
     |> then_(json => json |> PayloadParser.user |> resolve)
   );
 };
+
+let getCurrentUserGuilds =
+    (
+      ~before: option(snowflake)=?,
+      ~after: option(snowflake)=?,
+      ~limit: option(int)=?,
+      (),
+    ) => {
+  Js.Promise.(
+    Api.requestGet(
+      "/users/@me/guilds",
+      ~queryParams=
+        Api.createParams([
+          ("before", before),
+          ("after", after),
+          ("limit", Belt.Option.map(limit, string_of_int)),
+        ]),
+      (),
+    )
+    |> then_(json =>
+         json |> Json.Decode.array(PayloadParser.guild) |> resolve
+       )
+  );
+};

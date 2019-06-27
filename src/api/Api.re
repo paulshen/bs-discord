@@ -12,6 +12,19 @@ let urlWithQueryParams = (url, params) => {
   };
 };
 
+let createParams = (params: list((string, option(string)))) => {
+  let filteredParams = [||];
+  List.iter(
+    ((key, value)) =>
+      switch (value) {
+      | Some(value) => Js.Array.push((key, value), filteredParams) |> ignore
+      | None => ()
+      },
+    params,
+  );
+  filteredParams;
+};
+
 exception ApiError(int);
 let requestGet = (url, ~queryParams=?, ()) => {
   let endpoint = Constants.apiBaseUrl ++ url;
