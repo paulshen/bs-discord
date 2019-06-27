@@ -24,6 +24,9 @@ function onMessage(message) {
       var message$1 = match[0];
       if ("ping".indexOf(message$1[/* content */5]) !== -1) {
         ChannelApi$BsDiscord.createMessage(message$1[/* channelId */1], "pong");
+      }
+      if ("patch".indexOf(message$1[/* content */5]) !== -1) {
+        console.log("patch", ChannelApi$BsDiscord.updateChannel(message$1[/* channelId */1], "Hello", undefined, undefined, undefined, undefined, undefined, undefined, undefined, /* () */0));
         return /* () */0;
       } else {
         return 0;

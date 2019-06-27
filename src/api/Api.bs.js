@@ -51,12 +51,12 @@ function requestGet(url, queryParams, param) {
               }));
 }
 
-function requestPost(url, body, param) {
+function requestPost(url, bodyJson, param) {
   return fetch(Constants$BsDiscord.apiBaseUrl + url, Fetch.RequestInit[/* make */0](/* Post */2, {
                         "Content-Type": "application/json",
                         Authorization: "Bot " + (String(Constants$BsDiscord.token) + "")
-                      }, Belt_Option.map(body, (function (body) {
-                              return JSON.stringify(body);
+                      }, Belt_Option.map(bodyJson, (function (bodyJson) {
+                              return JSON.stringify(bodyJson);
                             })), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)(/* () */0)).then((function (response) {
                   var statusCode = response.status;
                   var switcher = statusCode - 200 | 0;

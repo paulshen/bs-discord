@@ -6,7 +6,51 @@ var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Caml_option = require("bs-platform/lib/js/caml_option.js");
 var Json_decode = require("@glennsl/bs-json/src/Json_decode.bs.js");
 var Api$BsDiscord = require("./Api.bs.js");
+var Caml_builtin_exceptions = require("bs-platform/lib/js/caml_builtin_exceptions.js");
 var PayloadParser$BsDiscord = require("../PayloadParser.bs.js");
+
+function getChannel(channelId) {
+  return Api$BsDiscord.requestGet("/channels/" + (String(channelId) + ""), undefined, /* () */0).then((function (json) {
+                return Promise.resolve(PayloadParser$BsDiscord.channel(json));
+              }));
+}
+
+function updateChannel(channelId, name, position, topic, nsfw, rateLimitPerUser, bitrate, userLimit, parentId, param) {
+  var tmp = { };
+  if (name !== undefined) {
+    tmp.name = Caml_option.valFromOption(name);
+  }
+  if (position !== undefined) {
+    tmp.position = Caml_option.valFromOption(position);
+  }
+  if (topic !== undefined) {
+    tmp.topic = Caml_option.valFromOption(topic);
+  }
+  if (nsfw !== undefined) {
+    tmp.nsfw = Caml_option.valFromOption(nsfw);
+  }
+  if (rateLimitPerUser !== undefined) {
+    tmp.rate_limit_per_user = Caml_option.valFromOption(rateLimitPerUser);
+  }
+  if (bitrate !== undefined) {
+    tmp.bitrate = Caml_option.valFromOption(bitrate);
+  }
+  if (userLimit !== undefined) {
+    tmp.user_limit = Caml_option.valFromOption(userLimit);
+  }
+  if (parentId !== undefined) {
+    tmp.parent_id = Caml_option.valFromOption(parentId);
+  }
+  var bodyJson = tmp;
+  return Api$BsDiscord.requestPost("/channels/" + (String(channelId) + ""), Caml_option.some(bodyJson), /* () */0).then((function (json) {
+                  var channel = PayloadParser$BsDiscord.channel(json);
+                  console.log("patchMessage", channel);
+                  return Promise.resolve(channel);
+                })).catch((function (err) {
+                console.log("error", err);
+                return Promise.reject(Caml_builtin_exceptions.not_found);
+              }));
+}
 
 function createMessage(channelId, content) {
   var body = { };
@@ -67,6 +111,8 @@ function getMessages(channelId, around, before, after, limit, param) {
               }));
 }
 
+exports.getChannel = getChannel;
+exports.updateChannel = updateChannel;
 exports.createMessage = createMessage;
 exports.createParams = createParams;
 exports.getMessages = getMessages;

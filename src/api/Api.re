@@ -45,7 +45,7 @@ let requestGet = (url, ~queryParams=?, ()) => {
   );
 };
 
-let requestPost = (url, ~body=?, ()) => {
+let requestPost = (url, ~bodyJson=?, ()) => {
   let token = Constants.token;
   Js.Promise.(
     Fetch.fetchWithInit(
@@ -53,8 +53,8 @@ let requestPost = (url, ~body=?, ()) => {
       Fetch.RequestInit.make(
         ~method_=Post,
         ~body=?{
-          Belt.Option.map(body, body =>
-            Fetch.BodyInit.make(Js.Json.stringify(Js.Json.object_(body)))
+          Belt.Option.map(bodyJson, bodyJson =>
+            Fetch.BodyInit.make(Js.Json.stringify(bodyJson))
           );
         },
         ~headers=

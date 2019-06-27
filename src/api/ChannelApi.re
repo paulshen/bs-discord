@@ -1,9 +1,79 @@
 open Types;
 
+let getChannel = (channelId: snowflake) => {
+  Api.requestGet({j|/channels/$channelId|j}, ())
+  |> Js.Promise.(then_(json => json |> PayloadParser.channel |> resolve));
+};
+
+external hackType: 'a => 'b = "%identity";
+[@bs.deriving abstract]
+type updateChannelParams = {
+  [@bs.optional]
+  name: string,
+  [@bs.optional]
+  position: int,
+  [@bs.optional]
+  topic: string,
+  [@bs.optional]
+  nsfw: bool,
+  [@bs.optional] [@bs.as "rate_limit_per_user"]
+  rateLimitPerUser: int,
+  [@bs.optional]
+  bitrate: int,
+  [@bs.optional] [@bs.as "user_limit"]
+  userLimit: int,
+  [@bs.optional] [@bs.as "parent_id"]
+  parentId: snowflake,
+};
+let updateChannel =
+    (
+      channelId: snowflake,
+      ~name=?,
+      ~position=?,
+      ~topic=?,
+      ~nsfw=?,
+      ~rateLimitPerUser=?,
+      ~bitrate=?,
+      ~userLimit=?,
+      ~parentId=?,
+      (),
+    ) => {
+  let bodyJson =
+    hackType(
+      updateChannelParams(
+        ~name?,
+        ~position?,
+        ~topic?,
+        ~nsfw?,
+        ~rateLimitPerUser?,
+        ~bitrate?,
+        ~userLimit?,
+        ~parentId?,
+        (),
+      ),
+    );
+  Js.Promise.(
+    Api.requestPost({j|/channels/$channelId|j}, ~bodyJson, ())
+    |> then_(json => {
+         let channel = PayloadParser.channel(json);
+         Js.log2("patchMessage", channel);
+         resolve(channel);
+       })
+    |> catch(err => {
+         Js.log2("error", err);
+         reject(Not_found);
+       })
+  );
+};
+
 let createMessage = (channelId: snowflake, content: string) => {
   let body = Js.Dict.empty();
   Js.Dict.set(body, "content", Js.Json.string(content));
-  Api.requestPost({j|/channels/$channelId/messages|j}, ~body, ())
+  Api.requestPost(
+    {j|/channels/$channelId/messages|j},
+    ~bodyJson=Json.Encode.dict(body),
+    (),
+  )
   |> Js.Promise.(
        then_(json => {
          let message = PayloadParser.message(json);
