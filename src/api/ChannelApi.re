@@ -64,7 +64,7 @@ let updateChannel =
 
 let deleteChannel = (channelId: snowflake) => {
   Js.Promise.(
-    Api.requestDelete({j|/channels/$channelId|j})
+    Api.requestDelete({j|/channels/$channelId|j}, ())
     |> then_(json => {
          let channel = PayloadParser.channel(json);
          Js.log2("deleteMessage", channel);
@@ -146,6 +146,120 @@ let addReaction =
   Js.Promise.(
     Api.requestPut(
       {j|/channels/$channelId/messages/$messageId/reactions/$emoji/@me|j},
+      (),
+    )
+    |> then_(_json => resolve())
+  );
+};
+
+let deleteReaction =
+    (
+      channelId: snowflake,
+      messageId: snowflake,
+      ~emojiName: string,
+      ~emojiId: snowflake,
+    ) => {
+  let emoji = {j|$emojiName:$emojiId|j};
+  Js.Promise.(
+    Api.requestDelete(
+      {j|/channels/$channelId/messages/$messageId/reactions/$emoji/@me|j},
+      (),
+    )
+    |> then_(_json => resolve())
+  );
+};
+
+let deleteUserReaction =
+    (
+      channelId: snowflake,
+      messageId: snowflake,
+      ~emojiName: string,
+      ~emojiId: snowflake,
+      ~userId: snowflake,
+    ) => {
+  let emoji = {j|$emojiName:$emojiId|j};
+  Js.Promise.(
+    Api.requestDelete(
+      {j|/channels/$channelId/messages/$messageId/reactions/$emoji/$userId|j},
+      (),
+    )
+    |> then_(_json => resolve())
+  );
+};
+
+let getReactions =
+    (
+      channelId: snowflake,
+      messageId: snowflake,
+      ~emojiName: string,
+      ~emojiId: snowflake,
+      ~before: option(snowflake)=?,
+      ~after: option(snowflake)=?,
+      ~limit: option(int)=?,
+      (),
+    ) => {
+  let emoji = {j|$emojiName:$emojiId|j};
+  Js.Promise.(
+    Api.requestGet(
+      {j|/channels/$channelId/messages/$messageId/reactions/$emoji|j},
+      ~queryParams=
+        Api.createParams([
+          ("before", before),
+          ("after", after),
+          ("limit", Belt.Option.map(limit, string_of_int)),
+        ]),
+      (),
+    )
+    |> then_(json => json |> Json.Decode.array(PayloadParser.user) |> resolve)
+  );
+};
+
+let deleteAllReaction = (channelId: snowflake, messageId: snowflake) => {
+  Js.Promise.(
+    Api.requestDelete(
+      {j|/channels/$channelId/messages/$messageId/reactions|j},
+      (),
+    )
+    |> then_(_json => resolve())
+  );
+};
+
+[@bs.deriving abstract]
+type updateMessageParams = {
+  [@bs.optional]
+  content: string,
+  /* todo: embed */
+};
+let editMessage = (channelId: snowflake, messageId: snowflake, ~content=?, ()) => {
+  let bodyJson = hackType(updateMessageParams(~content?, ()));
+  Js.Promise.(
+    Api.requestPatch(
+      {j|/channels/$channelId/messages/$messageId|j},
+      ~bodyJson,
+      (),
+    )
+    |> then_(json => json |> PayloadParser.message |> resolve)
+  );
+};
+
+let deleteMessage = (channelId: snowflake, messageId: snowflake) => {
+  Js.Promise.(
+    Api.requestDelete({j|/channels/$channelId/messages/$messageId|j}, ())
+    |> then_(_json => resolve())
+  );
+};
+
+let deleteBulkMessages = (channelId: snowflake, messageIds: array(snowflake)) => {
+  let body = Js.Dict.empty();
+  Js.Dict.set(
+    body,
+    "messages",
+    Js.Json.array(Array.map(Js.Json.string, messageIds)),
+  );
+  Js.Promise.(
+    Api.requestDelete(
+      {j|/channels/$channelId/messages/bulk-delete|j},
+      ~bodyJson=Js.Json.object_(body),
       (),
     )
     |> then_(_json => resolve())

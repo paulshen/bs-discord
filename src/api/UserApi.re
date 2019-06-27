@@ -55,7 +55,7 @@ let getCurrentUserGuilds =
 
 let leaveGuild = (guildId: snowflake) => {
   Js.Promise.(
-    Api.requestDelete({j|/users/@me/guilds/$guildId|j})
+    Api.requestDelete({j|/users/@me/guilds/$guildId|j}, ())
     |> then_(_ => resolve())
   );
 };

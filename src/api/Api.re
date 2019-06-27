@@ -157,13 +157,18 @@ let requestPut = (url, ~bodyJson=?, ()) => {
   );
 };
 
-let requestDelete = url => {
+let requestDelete = (url, ~bodyJson=?, ()) => {
   let token = Constants.token;
   Js.Promise.(
     Fetch.fetchWithInit(
       Constants.apiBaseUrl ++ url,
       Fetch.RequestInit.make(
         ~method_=Delete,
+        ~body=?{
+          Belt.Option.map(bodyJson, bodyJson =>
+            Fetch.BodyInit.make(Js.Json.stringify(bodyJson))
+          );
+        },
         ~headers=
           Fetch.HeadersInit.make({
             "Content-Type": "application/json",
