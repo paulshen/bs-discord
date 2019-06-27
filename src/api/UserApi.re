@@ -52,3 +52,43 @@ let getCurrentUserGuilds =
        )
   );
 };
+
+let leaveGuild = (guildId: snowflake) => {
+  Js.Promise.(
+    Api.requestDelete({j|/users/@me/guilds/$guildId|j})
+    |> then_(_ => resolve())
+  );
+};
+
+let getUserDMs = () => {
+  Js.Promise.(
+    Api.requestGet("/users/@me/channels", ())
+    |> then_(json =>
+         json |> Json.Decode.array(PayloadParser.channel) |> resolve
+       )
+  );
+};
+
+let createDM = (~recipientId) => {
+  let body = Js.Dict.empty();
+  Js.Dict.set(body, "recipient_id", Js.Json.string(recipientId));
+  Js.Promise.(
+    Api.requestPost(
+      "/users/@me/channels",
+      ~bodyJson=Json.Encode.dict(body),
+      (),
+    )
+    |> then_(json =>
+         json |> Json.Decode.array(PayloadParser.channel) |> resolve
+       )
+  );
+};
+
+let getUserConnections = () => {
+  Js.Promise.(
+    Api.requestGet("/users/@me/connections", ())
+    |> then_(json =>
+         json |> Json.Decode.array(PayloadParser.userConnection) |> resolve
+       )
+  );
+};

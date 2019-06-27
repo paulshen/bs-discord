@@ -17,6 +17,23 @@ let user = (json): user => {
   };
 };
 
+let userConnection = (json): userConnection => {
+  Json.Decode.{
+    id: json |> field("id", string),
+    name: json |> field("name", string),
+    type_: json |> field("type", string),
+    revoked: json |> field("revoked", bool),
+    verified: json |> field("revoked", bool),
+    friendSync: json |> field("friend_sync", bool),
+    showActivity: json |> field("show_activity", bool),
+    visibility:
+      json
+      |> field("visibility", int)
+      |> userConnectionVisibilityFromJs
+      |> Belt.Option.getExn,
+  };
+};
+
 let channel = (json): channel => {
   Json.Decode.{
     id: json |> field("id", string),

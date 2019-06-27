@@ -40,6 +40,19 @@ function user(json) {
         ];
 }
 
+function userConnection(json) {
+  return /* record */[
+          /* id */Json_decode.field("id", Json_decode.string, json),
+          /* name */Json_decode.field("name", Json_decode.string, json),
+          /* type_ */Json_decode.field("type", Json_decode.string, json),
+          /* revoked */Json_decode.field("revoked", Json_decode.bool, json),
+          /* verified */Json_decode.field("revoked", Json_decode.bool, json),
+          /* friendSync */Json_decode.field("friend_sync", Json_decode.bool, json),
+          /* showActivity */Json_decode.field("show_activity", Json_decode.bool, json),
+          /* visibility */Belt_Option.getExn(Types$BsDiscord.userConnectionVisibilityFromJs(Json_decode.field("visibility", Json_decode.$$int, json)))
+        ];
+}
+
 function channel(json) {
   return /* record */[
           /* id */Json_decode.field("id", Json_decode.string, json),
@@ -410,6 +423,7 @@ function parseSocketData(json) {
 }
 
 exports.user = user;
+exports.userConnection = userConnection;
 exports.channel = channel;
 exports.guildMember = guildMember;
 exports.partialGuildMember = partialGuildMember;

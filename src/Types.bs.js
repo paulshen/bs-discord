@@ -3,6 +3,17 @@
 
 var Js_mapperRt = require("bs-platform/lib/js/js_mapperRt.js");
 
+function userConnectionVisibilityToJs(param) {
+  return param + 0 | 0;
+}
+
+function userConnectionVisibilityFromJs(param) {
+  if (param <= 1 && 0 <= param) {
+    return param - 0 | 0;
+  }
+  
+}
+
 function activityTypeToJs(param) {
   return param + 0 | 0;
 }
@@ -86,6 +97,8 @@ function messageTypeFromJs(param) {
   
 }
 
+exports.userConnectionVisibilityToJs = userConnectionVisibilityToJs;
+exports.userConnectionVisibilityFromJs = userConnectionVisibilityFromJs;
 exports.activityTypeToJs = activityTypeToJs;
 exports.activityTypeFromJs = activityTypeFromJs;
 exports.clientStatusTypeToJs = clientStatusTypeToJs;

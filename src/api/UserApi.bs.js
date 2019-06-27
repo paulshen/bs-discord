@@ -56,8 +56,38 @@ function getCurrentUserGuilds(before, after, limit, param) {
               }));
 }
 
+function leaveGuild(guildId) {
+  return Api$BsDiscord.requestDelete("/users/@me/guilds/" + (String(guildId) + "")).then((function (param) {
+                return Promise.resolve(/* () */0);
+              }));
+}
+
+function getUserDMs(param) {
+  return Api$BsDiscord.requestGet("/users/@me/channels", undefined, /* () */0).then((function (json) {
+                return Promise.resolve(Json_decode.array(PayloadParser$BsDiscord.channel, json));
+              }));
+}
+
+function createDM(recipientId) {
+  var body = { };
+  body["recipient_id"] = recipientId;
+  return Api$BsDiscord.requestPost("/users/@me/channels", Caml_option.some(body), /* () */0).then((function (json) {
+                return Promise.resolve(Json_decode.array(PayloadParser$BsDiscord.channel, json));
+              }));
+}
+
+function getUserConnections(param) {
+  return Api$BsDiscord.requestGet("/users/@me/connections", undefined, /* () */0).then((function (json) {
+                return Promise.resolve(Json_decode.array(PayloadParser$BsDiscord.userConnection, json));
+              }));
+}
+
 exports.getCurrentUser = getCurrentUser;
 exports.getUser = getUser;
 exports.updateCurrentUser = updateCurrentUser;
 exports.getCurrentUserGuilds = getCurrentUserGuilds;
+exports.leaveGuild = leaveGuild;
+exports.getUserDMs = getUserDMs;
+exports.createDM = createDM;
+exports.getUserConnections = getUserConnections;
 /* No side effect */

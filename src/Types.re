@@ -14,6 +14,22 @@ type user = {
   premiumType: option(int),
 };
 
+[@bs.deriving jsConverter]
+type userConnectionVisibility =
+  | [@bs.as 0] None
+  | [@bs.as 1] Everyone;
+type userConnection = {
+  id: snowflake,
+  name: string,
+  type_: string,
+  revoked: bool,
+  /* todo: integrations */
+  verified: bool,
+  friendSync: bool,
+  showActivity: bool,
+  visibility: userConnectionVisibility,
+};
+
 type guildMember = {
   user,
   nick: option(string),
