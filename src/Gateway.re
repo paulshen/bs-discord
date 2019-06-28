@@ -5,7 +5,7 @@ open State;
 exception Unsupported;
 external hackType: 'a => 'b = "%identity";
 
-let identify = ({ws}, token) => {
+let identify = (ws, token) => {
   Websocket.send(
     ws,
     Js.Json.stringify(
@@ -24,7 +24,7 @@ let identify = ({ws}, token) => {
   );
 };
 
-let resume = ({ws, sessionId, lastSequenceId}, token) => {
+let resume = (ws, {sessionId, lastSequenceId}, token) => {
   Websocket.send(
     ws,
     Js.Json.stringify(
@@ -45,34 +45,42 @@ let resume = ({ws, sessionId, lastSequenceId}, token) => {
   );
 };
 
-let startHeartbeat = (ws, lastSequenceId, payload) => {
-  Js.Global.setInterval(
-    () => {
-      Js.log("heartbeat");
-      Websocket.send(
-        ws,
-        Js.Json.stringify(
-          hackType({
-            "op": opCodeToJs(Heartbeat),
-            "d":
-              switch (lastSequenceId^) {
-              | Some(heartbeatSequence) =>
-                Js.Nullable.return(heartbeatSequence)
-              | None => Js.Nullable.null
-              },
-          }),
-        ),
-      );
-    },
-    payload.heartbeatInterval,
-  )
-  |> ignore;
+let startHeartbeat =
+    (ws, {lastSequenceId, heartbeatInterval}, payload: helloPayload) => {
+  switch (heartbeatInterval^) {
+  | Some(heartbeatInterval) => Js.Global.clearInterval(heartbeatInterval)
+  | None => ()
+  };
+  heartbeatInterval :=
+    Some(
+      Js.Global.setInterval(
+        () => {
+          Js.log("heartbeat");
+          Websocket.send(
+            ws,
+            Js.Json.stringify(
+              hackType({
+                "op": opCodeToJs(Heartbeat),
+                "d":
+                  switch (lastSequenceId^) {
+                  | Some(heartbeatSequence) =>
+                    Js.Nullable.return(heartbeatSequence)
+                  | None => Js.Nullable.null
+                  },
+              }),
+            ),
+          );
+        },
+        payload.heartbeatInterval,
+      ),
+    );
 };
 
 let handleMessage = (state, message) => {
-  let {ws, lastSequenceId, sessionId} = state.gateway;
+  let {sessionId} = state.gateway;
   switch (message) {
-  | Hello(payload) => startHeartbeat(ws, lastSequenceId, payload)
+  | Hello(payload) =>
+    startHeartbeat(Belt.Option.getExn(state.ws^), state.gateway, payload)
   | Dispatch(Ready(readyPayload)) =>
     sessionId := Some(readyPayload.sessionId)
   | Dispatch(GuildCreate(guild)) =>
@@ -87,34 +95,33 @@ let handleMessage = (state, message) => {
   };
 };
 
-let createSocket =
-    (~token, ~onOpen=?, ~onMessage=?, ~onError=?, ~onClose=?, ()) => {
-  let gatewayState = {
-    ws: Websocket.make("wss://gateway.discord.gg/?v=6&encoding=json"),
-    sessionId: ref(None),
-    lastSequenceId: ref(None),
-  };
-  let state = {
-    gateway: gatewayState,
-    presences: PresenceStore.getInitialState(),
-  };
+let connectSocket =
+    (
+      gatewayState: gatewayState,
+      ~token,
+      ~onOpen,
+      ~onMessage,
+      ~onError,
+      ~onClose,
+    ) => {
+  let ws = Websocket.make("wss://gateway.discord.gg/?v=6&encoding=json");
 
   Websocket.onOpen(
-    gatewayState.ws,
+    ws,
     e => {
       switch (onOpen) {
       | Some(onOpen) => onOpen(e)
       | None => ()
       };
       switch (gatewayState.sessionId^) {
-      | Some(_) => resume(gatewayState, token)
-      | None => identify(gatewayState, token)
+      | Some(_) => resume(ws, gatewayState, token)
+      | None => identify(ws, token)
       };
     },
   );
 
   Websocket.onMessage(
-    gatewayState.ws,
+    ws,
     e => {
       Js.log(MessageEvent.data(e));
       let json = Js.Json.parseExn(MessageEvent.data(e));
@@ -122,34 +129,80 @@ let createSocket =
       | Some(sequenceId) => gatewayState.lastSequenceId := Some(sequenceId)
       | None => ()
       };
-
-      let message = PayloadParser.parseSocketData(json);
-      handleMessage(state, message);
-      switch (onMessage) {
-      | Some(onMessage) => onMessage(message)
-      | None => ()
-      };
-      ();
+      onMessage(json);
     },
   );
 
   Websocket.onError(
-    gatewayState.ws,
+    ws,
     e => {
       switch (onError) {
       | Some(onError) => onError(e)
       | None => ()
       };
-      Websocket.close(gatewayState.ws);
+      Websocket.close(ws);
     },
   );
 
-  Websocket.onClose(gatewayState.ws, e =>
-    switch (onClose) {
-    | Some(onClose) => onClose(e)
-    | None => ()
-    }
+  Websocket.onClose(
+    ws,
+    e => {
+      switch (gatewayState.heartbeatInterval^) {
+      | Some(heartbeatInterval) =>
+        Js.Global.clearInterval(heartbeatInterval);
+        gatewayState.heartbeatInterval := None;
+      | None => ()
+      };
+      onClose(e);
+    },
   );
+
+  ws;
+};
+
+let createConnection =
+    (~token, ~onOpen=?, ~onMessage=?, ~onError=?, ~onClose=?, ()) => {
+  let gatewayState = {
+    sessionId: ref(None),
+    lastSequenceId: ref(None),
+    heartbeatInterval: ref(None),
+  };
+  let state = {
+    ws: ref(None),
+    gateway: gatewayState,
+    presences: PresenceStore.getInitialState(),
+  };
+
+  let myOnMessage = json => {
+    let message = PayloadParser.parseSocketData(json);
+    handleMessage(state, message);
+    switch (onMessage) {
+    | Some(onMessage) => onMessage(message)
+    | None => ()
+    };
+  };
+
+  let rec connect = () =>
+    state.ws :=
+      Some(
+        connectSocket(
+          gatewayState,
+          ~token,
+          ~onOpen,
+          ~onMessage=myOnMessage,
+          ~onError,
+          ~onClose=e => {
+            switch (onClose) {
+            | Some(onClose) => onClose(e)
+            | None => ()
+            };
+
+            connect();
+          },
+        ),
+      );
+
+  connect();
 
   state;
 };

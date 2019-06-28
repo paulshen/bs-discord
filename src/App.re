@@ -77,7 +77,7 @@ let onClose = e => {
   Js.log2("onClose", e);
 };
 let state =
-  Gateway.createSocket(
+  Gateway.createConnection(
     ~token=Constants.token,
     ~onOpen,
     ~onMessage,
